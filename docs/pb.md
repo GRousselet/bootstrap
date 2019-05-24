@@ -62,7 +62,7 @@ boot.samp <- sample(samp, n, replace = TRUE) # sample with replacement
 boot.samp
 ```
 
-    ##  [1] 1 4 4 2 8 6 2 9 7 7
+    ##  [1] 1 8 4 2 3 6 5 6 7 2
 
 Generate 3 bootstrap samples for the article:
 
@@ -150,7 +150,8 @@ df <- tibble(res = c(boot.m, boot.tm, boot.md),
              )
 ggplot(df, aes(x = res, colour = est)) + theme_gar +
   geom_line(aes(y = ..density..), stat = "density", size = 1) +
-  labs(x = "Bootstrap estimates", y = "Density")
+  labs(x = "Bootstrap estimates", y = "Density") + 
+  theme(legend.position = "bottom")
 ```
 
 ![](pb_files/figure-markdown_github/unnamed-chunk-7-1.png)
