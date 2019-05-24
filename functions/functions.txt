@@ -1,0 +1,37 @@
+# Define coverage function
+cover <- function(ci, pop){
+  out <- ci[1] <= pop & ci[2] >= pop
+    out
+}
+
+# Define power function
+powerfun <- function(ci, mu=0){
+  out <- ci[1] > mu | ci[2] < mu
+    out
+}
+
+# Define quantile functions
+q1 <- function(x){
+  out <- hd(x, q = 0.25)
+}
+
+
+q2 <- function(x){
+  out <- hd(x, q = 0.5)
+}
+
+q3 <- function(x){
+  out <- hd(x, q = 0.75)
+}
+
+keeporder <- function(x){
+x <- as.character(x)
+x <- factor(x, levels=unique(x))
+x
+}
+
+# normalised difference
+normdiff <- function(x,y){
+  out <- (x-y) / (x+y)
+  out
+}
