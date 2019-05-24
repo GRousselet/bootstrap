@@ -23,7 +23,7 @@ The notebooks contain code to reproduce the figures and analyses presented in th
 |Notebook|Description|Figures|
 |-----|-----|-----|
 |[pb](/docs/pb.md)|Description of the percentile bootstrap|Figure 1 (figure_pb.pdf)|
-|`pc`|Percent correct example|Figure 2 (figure_pc.pdf)|
+|[pc](/docs/pc.md)|Percent correct example|Figure 2 (figure_pc.pdf)|
 |`sampdist`|Illustrate bootstrap sampling distributions|Figures 3-4 (figure_lognormal_pop.pdf, figure_sampdist_lognormal.pdf)|
 |`notrobust`|On its own, the bootstrap does not guarantee robustness|Figure 6 (figure_notrobust.pdf)|
 |`coverage`|Simulations of the coverage, width and power of one-sample confidence intervals|Figures 5, 7, 8 (figure_onesamp_50ci.pdf, figure_onesamp_coverage.pdf, figure_onesamp_stability.pdf)|
