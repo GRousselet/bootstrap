@@ -1,7 +1,7 @@
 Percentile bootstrap
 ================
 Guillaume A. Rousselet
-2019-05-24
+2019-05-25
 
 Dependencies
 ============
@@ -20,7 +20,7 @@ sessionInfo()
 
     ## R version 3.5.2 (2018-12-20)
     ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.4
+    ## Running under: macOS Mojave 10.14.5
     ## 
     ## Matrix products: default
     ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
@@ -42,7 +42,7 @@ sessionInfo()
     ## [13] grid_3.5.2       gtable_0.3.0     xfun_0.4         withr_2.1.2     
     ## [17] htmltools_0.3.6  yaml_2.2.0       lazyeval_0.2.2   digest_0.6.18   
     ## [21] assertthat_0.2.1 crayon_1.3.4     purrr_0.3.2      glue_1.3.1      
-    ## [25] evaluate_0.13    rmarkdown_1.11   stringi_1.4.3    compiler_3.5.2  
+    ## [25] evaluate_0.12    rmarkdown_1.11   stringi_1.4.3    compiler_3.5.2  
     ## [29] pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
 
 Bootstrap implementation
@@ -62,7 +62,7 @@ boot.samp <- sample(samp, n, replace = TRUE) # sample with replacement
 boot.samp
 ```
 
-    ##  [1] 1 8 4 2 3 6 5 6 7 2
+    ##  [1]  9  9  8 10  4  5  5  7  1  1
 
 Generate 3 bootstrap samples for the article:
 
@@ -182,8 +182,10 @@ Examples of R packages for bootstrap inferences: - [`boot`](https://www.statmeth
 Functions from [Rand Wilcox](https://dornsife.usc.edu/labs/rwilcox/software/).
 
 ``` r
+# TO USE THE FUNCTIONS, FIRST USE THE SOURCE COMMAND:
 # source('./functions/Rallfun-v35.txt')
-set.seed(1)
+
+set.seed(1) # reproducible results
 onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0)
 # est  = estimator, could be var, mad, to use a trimmed mean, add argument trim = 0.2
 onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0, trim = 0.1)
@@ -204,7 +206,7 @@ Generate sample from lognormal distribution
 Illustrate population
 ---------------------
 
-Distribution from the which the sample is taken.
+Lognormal distribution from the which the sample is taken.
 
 ``` r
 x <- seq(0, 7, 0.001)
@@ -215,7 +217,10 @@ df <- tibble(x = x, y = y)
 p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
   geom_line(size = 1.5, colour = "orange") +
   labs(x = "Values", y = "Density")
+p
 ```
+
+![](pb_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 Get sample
 ----------
@@ -412,7 +417,7 @@ bootsamp <- matrix(sample(samp, nboot * n, replace = TRUE), nrow = nboot)
 Illustrate a few bootstrap samples
 ----------------------------------
 
-For each sample we superimpose the median.
+For each sample we superimpose the (bootstrap) median.
 
 ``` r
 nb <- 20

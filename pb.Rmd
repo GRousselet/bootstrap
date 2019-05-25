@@ -82,7 +82,7 @@ samp.md
 ```
 
 ### Plot original results
-```{r}
+```{r, fig.width=2}
 set.seed(1)
 df <- tibble(cond = factor(rep(1,n)),
              res = samp) 
@@ -108,7 +108,8 @@ df <- tibble(res = c(boot.m, boot.tm, boot.md),
              )
 ggplot(df, aes(x = res, colour = est)) + theme_gar +
   geom_line(aes(y = ..density..), stat = "density", size = 1) +
-  labs(x = "Bootstrap estimates", y = "Density")
+  labs(x = "Bootstrap estimates", y = "Density") + 
+  theme(legend.position = "bottom")
   # ggtitle("Boostrap samples")
 ```
 
@@ -135,8 +136,10 @@ Examples of R packages for bootstrap inferences:
 Functions from [Rand Wilcox](https://dornsife.usc.edu/labs/rwilcox/software/).
 
 ```{r, eval = FALSE}
+# TO USE THE FUNCTIONS, FIRST USE THE SOURCE COMMAND:
 # source('./functions/Rallfun-v35.txt')
-set.seed(1)
+
+set.seed(1) # reproducible results
 onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0)
 # est  = estimator, could be var, mad, to use a trimmed mean, add argument trim = 0.2
 onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0, trim = 0.1)
@@ -155,8 +158,8 @@ hdpb()
 
 ## Illustrate population
 
-Distribution from the which the sample is taken.
-```{r}
+Lognormal distribution from the which the sample is taken.
+```{r, fig.height=3}
 x <- seq(0, 7, 0.001)
 y <- dlnorm(x)
 
@@ -165,6 +168,7 @@ df <- tibble(x = x, y = y)
 p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
   geom_line(size = 1.5, colour = "orange") +
   labs(x = "Values", y = "Density")
+p
 ```
 
 ## Get sample
@@ -177,7 +181,7 @@ samp <- rlnorm(n, meanlog = meanlog, sdlog = sdlog) # random sample
 ```
 
 ## Illustrate sample
-```{r}
+```{r, fig.width=2}
 set.seed(21) # for reproducible jitter
 # raw data
 df <- tibble(pc = samp,
@@ -198,14 +202,8 @@ p <- ggplot(data = df, aes(x = cond, y = pc)) + theme_gar +
   geom_segment(aes(x = 0.9, xend = 1.1,
                    y = median(samp), yend = median(samp)),
                linetype = 'longdash', lineend = 'round') +
-  # 20% trimmed mean
-  # geom_segment(aes(x = 0.9, xend = 1.1,
-  #                  y = mean(samp, trim = 0.2), yend = mean(samp, trim = 0.2)),
-  #              linetype = 'dotted', lineend = 'round') +
   theme(panel.grid.minor.x = element_blank()) +
   labs(y = "Values")
-  # ggtitle("Random sample") +
-  # coord_fixed(ratio = 0.1)
 p
 pA <- p
 ```
@@ -325,8 +323,10 @@ bootsamp <- matrix(sample(samp, nboot * n, replace = TRUE), nrow = nboot)
 ```
 
 ## Illustrate a few bootstrap samples
-For each sample we superimpose the median.
-```{r, fig.height=4}
+
+For each sample we superimpose the (bootstrap) median.
+
+```{r, fig.height=6}
 nb <- 20
 df <- tibble(res = as.vector(bootsamp[1:nb,]),
              bootid = rep(1:nb, each = n))
