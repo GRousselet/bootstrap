@@ -37,17 +37,29 @@ The notebooks contain code to reproduce the figures and analyses presented in th
    
 # R packages needed
 If you want to run the code in RStudio, you will need to install a few packages. 
+
 To reproduce the figures only, you can install the required packages by typing this in the console:
+
 `install.packages(c("ggplot2", "tibble"))` 
+
 Or you can navigate in the GUI to Tools > Install Packages...
+
 To install `rogme` and `facetscales`, first you will need to install `devtools`:
+
 `install.packages("devtools")`
+
 then:
+
 `devtools::install_github("GRousselet/rogme")`
+
 `devtools::install_github("zeehio/facetscales")`
+
 To reproduce the summary figures, you also need `cowplot` to combine panels:
+
 `install.packages("cowplot")` 
+
 Finally, if you decide to run the simulations, you will need `beepr` to get a little auditory reward:
+
 `install.packages("beepr")` 
   
 # Additional R functions 
