@@ -15,9 +15,9 @@ The repository contains all of the [R](https://www.r-project.org/) code  used in
 |`code`|R `.Rmd` files to run simulations and create figures|
 |`notebooks`|pdf versions of the code, with embedded figures|
 |`data`|simulation results needed to run the code|
-|`figures`|all the figures used in the article, in pdf format|
+|`figures`|all the figures used in the article, in pdf format (only available on the OSF version of the repo)|
 |`functions`|extra R functions defined in text files|
-|`docs`|html versions of the notebooks|
+|`docs`|Github html versions of the notebooks (only available on the [GitHub](https://github.com/GRousselet/bootstrap) version of the repo)|
  
  # Notebooks
 
@@ -44,7 +44,7 @@ To reproduce the figures only, you can install the required packages by typing t
 
 Or you can navigate in the GUI to Tools > Install Packages...
 
-To install `rogme` and `facetscales`, first you will need to install `devtools`:
+To install `rogme` and `facetscales`, first you might need to install `devtools`:
 
 `install.packages("devtools")`
 
