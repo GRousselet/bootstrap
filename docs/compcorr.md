@@ -1,7 +1,7 @@
 Compare correlations
 ================
 Guillaume A. Rousselet
-2019-05-25
+2019-05-27
 
 Dependencies
 ============
@@ -21,7 +21,7 @@ sessionInfo()
 
     ## R version 3.5.2 (2018-12-20)
     ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.5
+    ## Running under: macOS Mojave 10.14.4
     ## 
     ## Matrix products: default
     ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
@@ -43,7 +43,7 @@ sessionInfo()
     ## [13] grid_3.5.2       gtable_0.3.0     xfun_0.4         audio_0.1-5.1   
     ## [17] withr_2.1.2      htmltools_0.3.6  yaml_2.2.0       lazyeval_0.2.2  
     ## [21] digest_0.6.18    assertthat_0.2.1 crayon_1.3.4     purrr_0.3.2     
-    ## [25] glue_1.3.1       evaluate_0.12    rmarkdown_1.11   stringi_1.4.3   
+    ## [25] glue_1.3.1       evaluate_0.13    rmarkdown_1.11   stringi_1.4.3   
     ## [29] compiler_3.5.2   pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
 
 Correlation functions
@@ -82,8 +82,9 @@ df <- tibble(x = x,
 ggplot(df, aes(x = x, y = y)) + theme_classic() +
   # geom_hline(yintercept = 0) +
   # geom_vline(xintercept = 0) +
-  geom_point(alpha = 0.6, size = 3) +
-  geom_smooth(method='loess',formula=y~x) +
+  geom_point(alpha = 0.4, size = 3) +
+  # add smooth regression trend?
+  # geom_smooth(method='loess',formula=y~x) +
   theme(axis.title = element_text(size = 15, colour = "black"),
         axis.text = element_text(size = 13, colour = "black"),
         strip.text = element_text(size = 15, face = "bold")) +
@@ -298,8 +299,9 @@ df <- tibble(x = c(x1, x2),
 p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
   # geom_hline(yintercept = 0) +
   # geom_vline(xintercept = 0) +
-  geom_point(alpha = 0.6, size = 3) +
-  geom_smooth(method='loess',formula=y~x) +
+  geom_point(alpha = 0.4, size = 3) +
+  # add smooth regression trend?
+  # geom_smooth(method='loess',formula=y~x) +
   labs(x = expression(italic("Variable A")), y = expression(italic("Variable B"))) +
   facet_grid(cols = vars(group))
 pA1 <- p
@@ -438,8 +440,9 @@ df <- tibble(x = c(x1[bootid1.1], x2[bootid1.2],
 
 # ggplot figure
 p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
-  geom_point(alpha = 0.6, size = 3) +
-  geom_smooth(method='loess',formula=y~x) +
+  geom_point(alpha = 0.4, size = 3) +
+  # add smooth regression trend?
+  # geom_smooth(method='loess',formula=y~x) +
   scale_y_continuous(breaks = seq(-4, 4, 2)) +
   labs(x = expression(italic("Variable A")), y = expression(italic("Variable B"))) +
   facet_grid(rows = vars(boot), cols = vars(group))
@@ -829,7 +832,8 @@ df <- tibble(x = x[,1],
 # ggplot figure
 ggplot(df, aes(x = x, y = y)) + theme_classic() +
   geom_point(alpha = 0.6, size = 3) +
-  geom_smooth(method='loess',formula=y~x) +
+  # add smooth regression trend?
+  # geom_smooth(method='loess',formula=y~x) +
   theme(axis.title = element_text(size = 15, colour = "black"),
         axis.text = element_text(size = 13, colour = "black"),
         strip.text = element_text(size = 15, face = "bold")) +
@@ -849,7 +853,8 @@ df <- tibble(x = x[,2],
 # ggplot figure
 ggplot(df, aes(x = x, y = y)) + theme_classic() +
   geom_point(alpha = 0.6, size = 3) +
-  geom_smooth(method='loess',formula=y~x) +
+  # add smooth regression trend?
+  # geom_smooth(method='loess',formula=y~x) +
   theme(axis.title = element_text(size = 15, colour = "black"),
         axis.text = element_text(size = 13, colour = "black"),
         strip.text = element_text(size = 15, face = "bold")) +
