@@ -8,6 +8,10 @@ Rousselet G.A., Pernet C.R., Wilcox R.R.
 
 The repository contains all of the [R](https://www.r-project.org/) code  used in the article. The code is best seen by running the RMarkdown notebooks, within [RStudio](https://www.rstudio.com/). 
 
+The code is released under the [MIT license](https://opensource.org/licenses/MIT). Copyright 2019, Guillaume A. Rousselet.
+
+The figures are released under the [CC-BY 4.0 license](https://creativecommons.org/licenses/by/4.0/legalcode). Copyright 2019, Rousselet, Pernet & Wilcox.
+
 # Content
 |folder|description|
 |-----|-----|
