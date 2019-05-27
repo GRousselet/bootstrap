@@ -1,7 +1,7 @@
 Boostrap confidence intervals: coverage, width, stability, power
 ================
 Guillaume A. Rousselet
-2019-05-25
+2019-05-27
 
 Dependencies
 ============
@@ -31,7 +31,7 @@ sessionInfo()
 
     ## R version 3.5.2 (2018-12-20)
     ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.5
+    ## Running under: macOS Mojave 10.14.4
     ## 
     ## Matrix products: default
     ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
@@ -55,7 +55,7 @@ sessionInfo()
     ## [16] xfun_0.4          audio_0.1-5.1     withr_2.1.2      
     ## [19] htmltools_0.3.6   yaml_2.2.0        lazyeval_0.2.2   
     ## [22] digest_0.6.18     assertthat_0.2.1  crayon_1.3.4     
-    ## [25] purrr_0.3.2       glue_1.3.1        evaluate_0.12    
+    ## [25] purrr_0.3.2       glue_1.3.1        evaluate_0.13    
     ## [28] rmarkdown_1.11    stringi_1.4.3     compiler_3.5.2   
     ## [31] pillar_1.3.1      scales_1.0.0      pkgconfig_2.0.2
 
@@ -175,7 +175,7 @@ Save figure
 ggsave(filename=('./figures/figure_onesamp_50ci.pdf'),width=7,height=8)
 ```
 
-define population values
+Define population values
 ========================
 
 ``` r
