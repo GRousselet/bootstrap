@@ -1,7 +1,7 @@
 Bootstrap-t method
 ================
 Guillaume A. Rousselet
-2019-05-25
+2019-05-27
 
 ``` r
 # dependencies
@@ -20,7 +20,7 @@ sessionInfo()
 
     ## R version 3.5.2 (2018-12-20)
     ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.5
+    ## Running under: macOS Mojave 10.14.4
     ## 
     ## Matrix products: default
     ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
@@ -42,7 +42,7 @@ sessionInfo()
     ## [13] grid_3.5.2       gtable_0.3.0     xfun_0.4         audio_0.1-5.1   
     ## [17] withr_2.1.2      htmltools_0.3.6  assertthat_0.2.1 yaml_2.2.0      
     ## [21] lazyeval_0.2.2   digest_0.6.18    crayon_1.3.4     purrr_0.3.2     
-    ## [25] glue_1.3.1       evaluate_0.12    rmarkdown_1.11   stringi_1.4.3   
+    ## [25] glue_1.3.1       evaluate_0.13    rmarkdown_1.11   stringi_1.4.3   
     ## [29] compiler_3.5.2   pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
 
 Functions from Rand Wilcox
@@ -742,6 +742,10 @@ Get sample
 set.seed(21)
 n <- 30
 samp <- ghdist(n, g = 1, h = 0) 
+samp.m <- mean(samp, trim = 0) # sample mean
+samp.sem <- trimse(samp, tr = 0) # sample estimation of the standard error of the mean
+samp.20tm <- mean(samp, trim = 0.2) # sample 20% trimmed mean
+samp.se20tm <- trimse(samp, tr = 0.2) # sample estimation of the standard error of the 20% trimmed mean
 ```
 
 Illustrate procedure for the mean
@@ -826,6 +830,26 @@ abootT <- abs(bootT)
 abootT.q <- quantile(abootT, probs = 1-alpha, type = 6)
 ```
 
+**Confidence intervals**
+
+``` r
+# Symmetric CI
+CI.lo <- round(samp.m - abootT.q * samp.sem, digits = 2)
+CI.up <- round(samp.m + abootT.q * samp.sem, digits = 2)
+print(paste0("Symmetric CI = [",CI.lo,", ",CI.up,"]"))
+```
+
+    ## [1] "Symmetric CI = [-0.4, 1.62]"
+
+``` r
+# Asymmetric CI
+CI.lo <- round(samp.m - bootT.q[2] * samp.sem, digits = 2)
+CI.up <- round(samp.m - bootT.q[1] * samp.sem, digits = 2) 
+print(paste0("Asymmetric CI = [",CI.lo,", ",CI.up,"]"))
+```
+
+    ## [1] "Asymmetric CI = [0.08, 1.87]"
+
 **Illustrate**
 
 ``` r
@@ -872,7 +896,7 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-28-1.png)
+![](ptb_files/figure-markdown_github/unnamed-chunk-29-1.png)
 
 ``` r
 pA3 <- p
@@ -911,7 +935,7 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-29-1.png)
+![](ptb_files/figure-markdown_github/unnamed-chunk-30-1.png)
 
 ``` r
 pA4 <- p
@@ -946,7 +970,7 @@ pB1 <- p
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-30-1.png)
+![](ptb_files/figure-markdown_github/unnamed-chunk-31-1.png)
 
 ### Trimmed mean centred sample
 
@@ -976,7 +1000,7 @@ pB2 <- p
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-31-1.png)
+![](ptb_files/figure-markdown_github/unnamed-chunk-32-1.png)
 
 ### Bootstrap sampling distribution of *T* values
 
@@ -993,6 +1017,26 @@ bootT.q <- quantile(bootT, probs = c(alpha/2, 1-alpha/2), type = 6)
 abootT <- abs(bootT)
 abootT.q <- quantile(abootT, probs = 1-alpha, type = 6)
 ```
+
+**Confidence intervals**
+
+``` r
+# Symmetric CI
+CI.lo <- round(samp.20tm - abootT.q * samp.se20tm, digits = 2)
+CI.up <- round(samp.20tm + abootT.q * samp.se20tm, digits = 2)
+print(paste0("Symmetric CI = [",CI.lo,", ",CI.up,"]"))
+```
+
+    ## [1] "Symmetric CI = [-0.36, 0.59]"
+
+``` r
+# Asymmetric CI
+CI.lo <- round(samp.20tm - bootT.q[2] * samp.se20tm, digits = 2)
+CI.up <- round(samp.20tm - bootT.q[1] * samp.se20tm, digits = 2) 
+print(paste0("Asymmetric CI = [",CI.lo,", ",CI.up,"]"))
+```
+
+    ## [1] "Asymmetric CI = [-0.3, 0.67]"
 
 **Illustrate** Note how trimming reduces the skewness of the *T* sampling distribution.
 
@@ -1040,7 +1084,7 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-33-1.png)
+![](ptb_files/figure-markdown_github/unnamed-chunk-35-1.png)
 
 ``` r
 pB3 <- p
@@ -1079,7 +1123,7 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-34-1.png)
+![](ptb_files/figure-markdown_github/unnamed-chunk-36-1.png)
 
 ``` r
 pB4 <- p
