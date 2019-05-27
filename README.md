@@ -2,9 +2,9 @@ Reproducibility package for the article:
 
 **A practical introduction to the bootstrap: a versatile method to make inferences by using data-driven simulations**
 Rousselet G.A., Pernet C.R., Wilcox R.R.
-*in preparation*
+*submitted*
 
-[[OSF repository](https://osf.io/8b4t5/)] [[GitHub repository](https://github.com/GRousselet/bootstrap)] [[PsyArXiv Preprint]()]
+[[OSF repository](https://osf.io/8b4t5/)] [[GitHub repository](https://github.com/GRousselet/bootstrap)] [[PsyArXiv Preprint](https://psyarxiv.com/h8ft7)]
 
 The repository contains all of the [R](https://www.r-project.org/) code  used in the article. The code is best seen by running the RMarkdown notebooks, within [RStudio](https://www.rstudio.com/). 
 
