@@ -149,7 +149,7 @@ p
 ggsave(filename=('./figures/figure_onesamp_50ci.pdf'),width=7,height=8)
 ```
 
-# define population values
+# Define population values
 ```{r}
 pop <- rlnorm(10000000)
 pop.m <- exp(1/2) # mean(pop)

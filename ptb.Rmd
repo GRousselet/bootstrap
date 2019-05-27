@@ -3,15 +3,15 @@ title: "Bootstrap-t method"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
-    github_document:
-    html_preview: yes
+  pdf_document:
+    fig_caption: no
+    number_sections: no
     toc: yes
     toc_depth: 2
+    # github_document:
+    # html_preview: yes
+    # toc: yes
+    # toc_depth: 2
 ---
 
 ```{r message=FALSE, warning=FALSE}
@@ -656,6 +656,10 @@ ggsave(filename=('./figures/figure_ptb.pdf'),width=20,height=15)
 set.seed(21)
 n <- 30
 samp <- ghdist(n, g = 1, h = 0) 
+samp.m <- mean(samp, trim = 0) # sample mean
+samp.sem <- trimse(samp, tr = 0) # sample estimation of the standard error of the mean
+samp.20tm <- mean(samp, trim = 0.2) # sample 20% trimmed mean
+samp.se20tm <- trimse(samp, tr = 0.2) # sample estimation of the standard error of the 20% trimmed mean
 ```
 
 ## Illustrate procedure for the mean
@@ -730,6 +734,19 @@ bootT.q <- quantile(bootT, probs = c(alpha/2, 1-alpha/2), type = 6)
 # absolute T values
 abootT <- abs(bootT)
 abootT.q <- quantile(abootT, probs = 1-alpha, type = 6)
+```
+
+**Confidence intervals**
+```{r}
+# Symmetric CI
+CI.lo <- round(samp.m - abootT.q * samp.sem, digits = 2)
+CI.up <- round(samp.m + abootT.q * samp.sem, digits = 2)
+print(paste0("Symmetric CI = [",CI.lo,", ",CI.up,"]"))
+
+# Asymmetric CI
+CI.lo <- round(samp.m - bootT.q[2] * samp.sem, digits = 2)
+CI.up <- round(samp.m - bootT.q[1] * samp.sem, digits = 2) 
+print(paste0("Asymmetric CI = [",CI.lo,", ",CI.up,"]"))
 ```
 
 **Illustrate**
@@ -878,6 +895,19 @@ bootT.q <- quantile(bootT, probs = c(alpha/2, 1-alpha/2), type = 6)
 # absolute T values
 abootT <- abs(bootT)
 abootT.q <- quantile(abootT, probs = 1-alpha, type = 6)
+```
+
+**Confidence intervals**
+```{r}
+# Symmetric CI
+CI.lo <- round(samp.20tm - abootT.q * samp.se20tm, digits = 2)
+CI.up <- round(samp.20tm + abootT.q * samp.se20tm, digits = 2)
+print(paste0("Symmetric CI = [",CI.lo,", ",CI.up,"]"))
+
+# Asymmetric CI
+CI.lo <- round(samp.20tm - bootT.q[2] * samp.se20tm, digits = 2)
+CI.up <- round(samp.20tm - bootT.q[1] * samp.se20tm, digits = 2) 
+print(paste0("Asymmetric CI = [",CI.lo,", ",CI.up,"]"))
 ```
 
 **Illustrate**

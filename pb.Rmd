@@ -3,15 +3,15 @@ title: "Percentile bootstrap"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
-    github_document:
-    html_preview: yes
+  pdf_document:
+    fig_caption: no
+    number_sections: no
     toc: yes
     toc_depth: 2
+    # github_document:
+    # html_preview: yes
+    # toc: yes
+    # toc_depth: 2
 ---
 
 # Dependencies
@@ -82,7 +82,7 @@ samp.md
 ```
 
 ### Plot original results
-```{r, fig.width=2}
+```{r, fig.width=3}
 set.seed(1)
 df <- tibble(cond = factor(rep(1,n)),
              res = samp) 
@@ -94,8 +94,10 @@ ggplot(df, aes(x = cond, y = res)) + theme_linedraw() +
   # stat_summary(fun.y=median, geom="line")
   geom_segment(aes(x = 0.9, y = samp.m, xend = 1.1, yend = samp.m)) +
   geom_segment(aes(x = 0.9, y = samp.md, xend = 1.1, yend = samp.md), colour = "orange") +
-  annotate("text", x = 1.2, y = samp.m, label = "Mean", size = 3) +
-  annotate("text", x = 1.2, y = samp.md, label = "Median", size = 3, colour = "orange")
+  geom_segment(aes(x = 0.9, y = samp.tm, xend = 1.1, yend = samp.tm), colour = "blue") +
+  annotate("text", x = 1.185, y = samp.m-0.1, label = 'bold("Mean")', size = 4, parse = TRUE) +
+  annotate("text", x = 1.2, y = samp.md+0.1, label = 'bold("Median")', size = 4, colour = "orange", parse = TRUE) +
+  annotate("text", x = 0.75, y = samp.tm, label = 'bold("Trimmed\nmean")', size = 4, colour = "blue", parse = TRUE)
 ```
 
 ### Plot distributions of bootstrap estimates
