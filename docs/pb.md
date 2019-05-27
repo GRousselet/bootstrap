@@ -1,7 +1,7 @@
 Percentile bootstrap
 ================
 Guillaume A. Rousselet
-2019-05-25
+2019-05-27
 
 Dependencies
 ============
@@ -20,7 +20,7 @@ sessionInfo()
 
     ## R version 3.5.2 (2018-12-20)
     ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.5
+    ## Running under: macOS Mojave 10.14.4
     ## 
     ## Matrix products: default
     ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
@@ -42,7 +42,7 @@ sessionInfo()
     ## [13] grid_3.5.2       gtable_0.3.0     xfun_0.4         withr_2.1.2     
     ## [17] htmltools_0.3.6  yaml_2.2.0       lazyeval_0.2.2   digest_0.6.18   
     ## [21] assertthat_0.2.1 crayon_1.3.4     purrr_0.3.2      glue_1.3.1      
-    ## [25] evaluate_0.12    rmarkdown_1.11   stringi_1.4.3    compiler_3.5.2  
+    ## [25] evaluate_0.13    rmarkdown_1.11   stringi_1.4.3    compiler_3.5.2  
     ## [29] pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
 
 Bootstrap implementation
@@ -62,7 +62,7 @@ boot.samp <- sample(samp, n, replace = TRUE) # sample with replacement
 boot.samp
 ```
 
-    ##  [1]  9  9  8 10  4  5  5  7  1  1
+    ##  [1] 3 5 1 3 5 6 9 7 5 8
 
 Generate 3 bootstrap samples for the article:
 
@@ -134,8 +134,10 @@ ggplot(df, aes(x = cond, y = res)) + theme_linedraw() +
   # stat_summary(fun.y=median, geom="line")
   geom_segment(aes(x = 0.9, y = samp.m, xend = 1.1, yend = samp.m)) +
   geom_segment(aes(x = 0.9, y = samp.md, xend = 1.1, yend = samp.md), colour = "orange") +
-  annotate("text", x = 1.2, y = samp.m, label = "Mean", size = 3) +
-  annotate("text", x = 1.2, y = samp.md, label = "Median", size = 3, colour = "orange")
+  geom_segment(aes(x = 0.9, y = samp.tm, xend = 1.1, yend = samp.tm), colour = "blue") +
+  annotate("text", x = 1.185, y = samp.m-0.1, label = 'bold("Mean")', size = 4, parse = TRUE) +
+  annotate("text", x = 1.2, y = samp.md+0.1, label = 'bold("Median")', size = 4, colour = "orange", parse = TRUE) +
+  annotate("text", x = 0.75, y = samp.tm, label = 'bold("Trimmed\nmean")', size = 4, colour = "blue", parse = TRUE)
 ```
 
 ![](pb_files/figure-markdown_github/unnamed-chunk-6-1.png)
@@ -257,14 +259,8 @@ p <- ggplot(data = df, aes(x = cond, y = pc)) + theme_gar +
   geom_segment(aes(x = 0.9, xend = 1.1,
                    y = median(samp), yend = median(samp)),
                linetype = 'longdash', lineend = 'round') +
-  # 20% trimmed mean
-  # geom_segment(aes(x = 0.9, xend = 1.1,
-  #                  y = mean(samp, trim = 0.2), yend = mean(samp, trim = 0.2)),
-  #              linetype = 'dotted', lineend = 'round') +
   theme(panel.grid.minor.x = element_blank()) +
   labs(y = "Values")
-  # ggtitle("Random sample") +
-  # coord_fixed(ratio = 0.1)
 p
 ```
 
