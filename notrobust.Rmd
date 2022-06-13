@@ -3,15 +3,15 @@ title: "The bootstrap is not robust"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
-    github_document:
-    html_preview: yes
+  pdf_document:
+    fig_caption: no
+    number_sections: no
     toc: yes
     toc_depth: 2
+    # github_document:
+    # html_preview: yes
+    # toc: yes
+    # toc_depth: 2
 ---
 
 # Dependencies
@@ -19,12 +19,12 @@ output:
 library(tibble)
 library(ggplot2)
 # library(cowplot)
-source("./functions/Rallfun-v35.txt")
+source("./functions/Rallfun-v40.txt")
 source("./functions/theme_gar.txt")
 ```
 
 The bootstrap is sometimes described as a robust technique. 
-In itself, it is not robust. A simple example can illustrate this lack of robustness: percentile bootstrap confidence intervals for the mean are not robust.
+In itself, it is not robust. A simple example can illustrate this lack of robustness: percentile bootstrap confidence intervals for the mean are not robust, because the mean is not a robust estimator of central tendency.  
 
 # Generate data and compute confidence intervals
 ```{r}
@@ -47,7 +47,7 @@ for(C in 1:7){
   ci_mean_t[,C] <- t.test(todo)$conf.int
   ci_mean_pb[,C] <- onesampb(todo, mean)$ci # default to nboot = 2000
   ci_median_pb[,C] <- onesampb(todo, median)$ci
-  ci_median_param[,C] <- sint(todo) # parametric method
+  ci_median_param[,C] <- sint(todo) # parametric method for the median
 }
 ```
 
@@ -108,6 +108,7 @@ pB <- p
 ```
 
 # Illustrate results: median + boot CI
+
 ```{r}
 set.seed(777) # for reproducible jitter
 # raw data
@@ -165,11 +166,11 @@ p
 
 # Summary figure
 ```{r, eval = FALSE}
-cowplot::plot_grid(pA, pB,
+cowplot::plot_grid(pA, pB, pC,
                     labels = c("A", "B", "C"),
-                    ncol = 2,
+                    ncol = 3,
                     nrow = 1,
-                    rel_widths = c(1, 1), 
+                    rel_widths = c(1, 1, 1), 
                     label_size = 20, 
                     hjust = -0.5, 
                     scale=.95,
@@ -177,4 +178,5 @@ cowplot::plot_grid(pA, pB,
 
 # save figure
 ggsave(filename=('./figures/figure_notrobust.pdf'),width=10,height=5)
+ggsave(filename=('./figures/figure6.pdf'),width=10,height=5)
 ```

@@ -1,16 +1,19 @@
 Bootstrap-t method
 ================
 Guillaume A. Rousselet
-2019-05-27
+2022-06-13
 
 ``` r
 # dependencies
 library(ggplot2)
 library(tibble)
-source('./functions/Rallfun-v35.txt')
+source('./functions/Rallfun-v40.txt')
 source('./functions/theme_gar.txt')
 source('./functions/functions.txt')
 library(beepr)
+# generate PDF of g-and-k distributions (generalised g-and-h distributions)
+# Prangle (2020) [https://journal.r-project.org/archive/2020/RJ-2020-010/index.html]
+library(gk)
 # library(cowplot)
 ```
 
@@ -18,13 +21,13 @@ library(beepr)
 sessionInfo()
 ```
 
-    ## R version 3.5.2 (2018-12-20)
-    ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.4
+    ## R version 4.2.0 (2022-04-22)
+    ## Platform: x86_64-apple-darwin17.0 (64-bit)
+    ## Running under: macOS Catalina 10.15.7
     ## 
     ## Matrix products: default
-    ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
     ## 
     ## locale:
     ## [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
@@ -33,23 +36,23 @@ sessionInfo()
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] beepr_1.3     tibble_2.1.1  ggplot2_3.1.1
+    ## [1] gk_0.5.1      beepr_1.3     tibble_3.1.7  ggplot2_3.3.6
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_1.0.1       knitr_1.21       magrittr_1.5     tidyselect_0.2.5
-    ##  [5] munsell_0.5.0    colorspace_1.4-1 R6_2.4.0         rlang_0.3.4     
-    ##  [9] stringr_1.4.0    plyr_1.8.4       dplyr_0.8.0.1    tools_3.5.2     
-    ## [13] grid_3.5.2       gtable_0.3.0     xfun_0.4         audio_0.1-5.1   
-    ## [17] withr_2.1.2      htmltools_0.3.6  assertthat_0.2.1 yaml_2.2.0      
-    ## [21] lazyeval_0.2.2   digest_0.6.18    crayon_1.3.4     purrr_0.3.2     
-    ## [25] glue_1.3.1       evaluate_0.13    rmarkdown_1.11   stringi_1.4.3   
-    ## [29] compiler_3.5.2   pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
+    ##  [1] pillar_1.7.0     compiler_4.2.0   tools_4.2.0      digest_0.6.29   
+    ##  [5] evaluate_0.15    lifecycle_1.0.1  gtable_0.3.0     pkgconfig_2.0.3 
+    ##  [9] rlang_1.0.2      cli_3.3.0        rstudioapi_0.13  yaml_2.3.5      
+    ## [13] xfun_0.31        fastmap_1.1.0    withr_2.5.0      stringr_1.4.0   
+    ## [17] dplyr_1.0.9      knitr_1.39       generics_0.1.2   vctrs_0.4.1     
+    ## [21] grid_4.2.0       tidyselect_1.1.2 glue_1.6.2       R6_2.5.1        
+    ## [25] fansi_1.0.3      rmarkdown_2.14   purrr_0.3.4      magrittr_2.0.3  
+    ## [29] scales_1.2.0     ellipsis_0.3.2   htmltools_0.5.2  colorspace_2.0-3
+    ## [33] utf8_1.2.2       stringi_1.7.6    munsell_0.5.0    crayon_1.5.1    
+    ## [37] audio_0.1-10
 
-Functions from Rand Wilcox
-==========================
+# Functions from Rand Wilcox
 
-One-sample
-----------
+## One-sample
 
 ``` r
 # one-sample test on trimmed means
@@ -62,8 +65,7 @@ trimcibt(x, tr=0.2, alpha=0.1, nboot=1000, side=FALSE)
 # side = TRUE for a symmetric confidence interval
 ```
 
-Two independent groups
-----------------------
+## Two independent groups
 
 ``` r
 # t-test on trimmed means
@@ -73,8 +75,7 @@ yuen(x,y,tr=.2,alpha=.05)
 yuenbt(x,y,tr=0.2,alpha=0.05,nboot=599,side=FALSE)
 ```
 
-Two dependent groups
---------------------
+## Two dependent groups
 
 ``` r
 # t-test on dependent trimmed means
@@ -84,11 +85,9 @@ yuend<-function(x,y,tr=.2,alpha=.05)
 ydbt(x,y,tr=0.2,alpha=0.05,nboot=599,side=FALSE,plotit=TRUE,op=1)
 ```
 
-Declare custom functions
-========================
+# Declare custom functions for simulations
 
-Modify `trimci` to return confidence interval only
---------------------------------------------------
+## Modify `trimci` to return confidence interval only
 
 ``` r
 #  Compute a 1-alpha confidence interval for the trimmed mean
@@ -103,8 +102,7 @@ trimci <- function(x, tr=.2, alpha=.05){
 }
 ```
 
-Modify `trimcibt` to return confidence interval only
-----------------------------------------------------
+## Modify `trimcibt` to return confidence interval only
 
 Return both symmetric and asymmetric confidence intervals
 
@@ -150,8 +148,7 @@ tval
 }
 ```
 
-Compute T-value only: define function
--------------------------------------
+## Compute T-value only: define function
 
 ``` r
 tval <- function(x,nv,tr=0){
@@ -161,36 +158,62 @@ tval <- function(x,nv,tr=0){
 }
 ```
 
-Expected vs. empirical t distributions
-======================================
+# Expected vs. empirical t distributions
 
-We consider populations that are progressively more skewed. With increased skewness, the sampling distributions of the T values also increases in skewness. This leads to inaccurate confidence intervals. The percentile-t bootstrap addresses this problem by using the data in the sample to compute a data-driven T distribution. We can then read the quantiles from that distribution and plug-in the values in the standard t-test confidence interval equation.
+We consider populations that are progressively more skewed. With
+increased skewness, the sampling distributions of the T values also
+increase in skewness. This leads to inaccurate confidence intervals. The
+percentile-t bootstrap addresses this problem by using the data in the
+sample to compute a data-driven T distribution. We can then read the
+quantiles from that distribution and plug-in the values in the standard
+t-test confidence interval equation.
 
-Populations
------------
+## Populations
 
-The `ghdist()` function is used to generate random numbers from *g & h* distributions. All such distributions have a median of zero. The parameter g controls the asymmetry of the distribution, while the parameter h controls the thickness of the tails. The g & h distributions are described in this 1985 book: <http://eu.wiley.com/WileyCDA/WileyTitle/productCd-047004005X.html> There is also a description in Rand Wilcox's book Introduction to Robust Estimation. See also: <https://www.jstor.org/stable/25471119>
+The `ghdist()` function is used to generate random numbers from *g & h*
+distributions. All such distributions have a median of zero. The
+parameter g controls the asymmetry of the distribution, while the
+parameter h controls the thickness of the tails. The g & h distributions
+are described in these sources:
 
-### Examples in which g varies from 0 to 1.
+<http://eu.wiley.com/WileyCDA/WileyTitle/productCd-047004005X.html>
+
+<https://www.elsevier.com/books/introduction-to-robust-estimation-and-hypothesis-testing/wilcox/978-0-12-820098-8>
+
+<https://www.jstor.org/stable/25471119>
+
+<https://journal.r-project.org/archive/2020/RJ-2020-010/index.html>
+
+### PDF and population values of g-and-h distributions
+
+In these examples, g varies from 0 to 1 in steps of 0.1. We generate
+populations of size n = 1,000,000 and save their means, trimmed means
+and medians.
 
 ``` r
 set.seed(21)
 nsim <- 1000000 # population size
 nkde <- 50000 # sample size for KDE
+# g-and-h parameters
 gseq <- seq(0,1,0.1) # sequence of g parameters
-xseq <- seq(-5,7,0.01) # points at which to compute KDE
-gh.kde <- matrix(0, nrow = length(xseq), ncol = length(gseq)) # KDE results to plot in next figure
+h <- 0
+A <- 0 # location parameter
+B <- 1 # scale parameter
+xseq <- seq(-5,7,0.01) # points at which to compute PDF
+gh.pdf <- matrix(0, nrow = length(xseq), ncol = length(gseq)) # PDFs to plot in next figure
 mean.g <- vector(mode = "numeric", length = length(gseq))
 tmean10.g <- vector(mode = "numeric", length = length(gseq))
 tmean20.g <- vector(mode = "numeric", length = length(gseq))
 md.g <- vector(mode = "numeric", length = length(gseq))
+
 for(G in 1:length(gseq)){
   print(paste("gseq =",G,"/",length(gseq)))
   beep(2)
   set.seed(7)
   samp <- ghdist(nsim, g = gseq[G], h = 0)
-  gh.kde[,G] <- akerd(ghdist(nkde, g = gseq[G], h = 0), 
-                      pts = xseq, pyhat = TRUE, plotit = FALSE)
+  # gh.kde[,G] <- akerd(ghdist(nkde, g = gseq[G], h = 0), 
+  #                     pts = xseq, pyhat = TRUE, plotit = FALSE)
+  gh.pdf[,G] <- gk::dgh(xseq, A, B, gseq[G], h)
   mean.g[G] <- mean(samp) # population mean
   tmean10.g[G] <- mean(samp, trim = 0.1) # population 10% trimmed mean
   tmean20.g[G] <- mean(samp, trim = 0.2) # population 20% trimmed mean
@@ -198,18 +221,18 @@ for(G in 1:length(gseq)){
 }
 
 save(gseq, mean.g, tmean10.g, tmean20.g, md.g, 
-     xseq, gh.kde,
+     xseq, gh.pdf,
   file = "./data/ptb_params.RData")
 ```
 
-Combine all kernel density functions into one data frame and make summary figure.
+Combine PDFs into one data frame and make summary figure.
 
 ``` r
 load(file = "./data/ptb_params.RData")
 
 # make data frame
 df <- tibble(x = rep(xseq, length(gseq)),
-             y = as.vector(gh.kde),
+             y = as.vector(gh.pdf),
              g = factor(rep(gseq, each = length(xseq))))
 
 # make plot
@@ -217,8 +240,10 @@ p <- ggplot(df, aes(x = x, y = y, colour = g)) + theme_gar +
           geom_line(size = 1) +
           scale_colour_viridis_d(end = 0.9) +
           theme(legend.title = element_text(size=16, face="bold"),
-                legend.position = c(.8, .55)) +
-          coord_cartesian(xlim = c(-4, 6)) +
+                legend.position = c(.8, .55),
+                axis.text.y = element_blank(),
+                axis.ticks.y = element_blank()) +
+          coord_cartesian(xlim = c(-3, 5)) +
           scale_y_continuous(breaks = seq(0, 1, 0.2)) +
   scale_x_continuous(breaks = seq(-4, 15, 1)) +
   labs(x = "Observations", y = "Density") +
@@ -226,16 +251,16 @@ p <- ggplot(df, aes(x = x, y = y, colour = g)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 p.g <- p
 ```
 
-T sampling distributions for g varying from 0 to 1.
----------------------------------------------------
+## T sampling distributions for g varying from 0 to 1.
 
-With positive g values, the *g&h* distributions are lognormal distributions.
+With positive g values, the *g&h* distributions are lognormal
+distributions.
 
 Compute sampling distributions of T values using 50,000 samples of n=30.
 
@@ -255,7 +280,8 @@ save(tres.g, nsim, n,
      file = "./data/gh_t_sampdist.RData")
 ```
 
-Combine all kernel density functions into one data frame and make summary figure.
+Combine sampling distributions into one data frame and make summary
+figure.
 
 ``` r
 load(file = "./data/gh_t_sampdist.RData")
@@ -268,7 +294,9 @@ p <- ggplot(df, aes(x = x, colour = g)) + theme_gar +
           geom_line(stat = "density", size=1) +
           scale_colour_viridis_d(end = 0.9) +
           theme(legend.title = element_text(size=16, face="bold"),
-                legend.position = c(.15, .55)) +
+                legend.position = c(.15, .55),
+                axis.text.y = element_blank(),
+                axis.ticks.y = element_blank()) +
           coord_cartesian(xlim = c(-8, 5)) +
           scale_y_continuous(breaks = seq(0, 1, 0.1)) +
   scale_x_continuous(breaks = seq(-8, 5, 1)) +
@@ -277,14 +305,13 @@ p <- ggplot(df, aes(x = x, colour = g)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-13-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 p.t <- p
 ```
 
-T values: assumed, real, bootstrap
-----------------------------------
+## T values: assumed, real, bootstrap
 
 ### Compute bootstrap samples
 
@@ -302,7 +329,10 @@ save(tboot, file = "./data/ptb_tboot.RData")
 
 ### Figure
 
-In grey: 20 bootstrap distributions of T values obtained from 20 samples of n=30 observations from a g&h distribution with g = 1. In red: theoretical T distribution. In black: empirical T distribution obtained using 50,000 samples of n=30 observations.
+In grey: 20 bootstrap distributions of T values obtained from 20 samples
+of n=30 observations from a g&h distribution with g = 1. In red:
+theoretical T distribution. In black: empirical T distribution obtained
+using 50,000 samples of n=30 observations.
 
 ``` r
 load(file = "./data/ptb_tboot.RData") # get tboot matrix
@@ -370,20 +400,21 @@ p <- ggplot(tibble(x = as.vector(tboot),
   coord_cartesian(xlim = c(-7, 4)) +
   scale_x_continuous(breaks = seq(-6, 5, 2)) +
   labs(x = "T values", y = "Density") +
-  theme(legend.position = c(.25, .8)) +
+  theme(legend.position = c(.25, .8),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
 guides(colour = guide_legend(override.aes = list(size = 3)))
   # ggtitle(paste0("t distribution: df = ",df))
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 p.boot <- p
 ```
 
-Coverage: t-test on means
--------------------------
+## Coverage: t-test on means
 
 ### Simulation
 
@@ -510,30 +541,40 @@ df <- tibble(coverage = c(as.vector(apply(t.cover.m, c(2,3), mean)),
 
 df$method <- keeporder(df$method)
 
-p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
+p <- ggplot(df, aes(x = g, y = coverage, colour = method, linetype = method)) + theme_gar +
   geom_hline(yintercept = 0.95) +
   geom_line(size = 1.5) +
   scale_color_viridis_d(end = 0.95) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
   coord_cartesian(ylim = c(.8, 1)) +
   scale_x_continuous(breaks = gseq, minor_breaks = NULL) +
   theme(legend.position = c(.25, .25)) +
   labs(x = "g parameter", y = "CI coverage") +
-  guides(colour = guide_legend(override.aes = list(size = 3)))
-# ggsave(filename = './theor_t.pdf')
+  guides(colour = guide_legend(override.aes = list(size = 3))) +
+  # ggtitle("Mean") +
+  # theme(plot.title = element_text(size = 16, face = "bold", vjust = - 8, hjust = 0.02))
+  annotate(geom = "label", x = 0, y = 0.99, label = "Mean ", size = 7, hjust = 0,
+           colour = "white", fill = "black", fontface = "bold")
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 p.coverage.m <- p
 ```
 
-For all methods, coverage goes down with skewness. Among the parametric methods, the standard t-test is the most affected by skewness, with coverage less than 90% for the most skewed condition. The asymmetric bootstrap-t CI seem to perform the best. The percentile bootstrap performs the worst in all situations, and has coverage systematically below 95%, including for normal distributions.
+For all methods, coverage goes down with skewness. Among the parametric
+methods, the standard t-test is the most affected by skewness, with
+coverage less than 90% for the most skewed condition. The asymmetric
+bootstrap-t CIs seem to perform the best. The percentile bootstrap
+performs the worst in all situations, and has coverage systematically
+below 95%, including for normal distributions.
 
 ### Figure: width
 
-Use median width to look at typical confidence interval. Using the mean suggests even larger differences.
+Use median width to look at typical confidence intervals. Using the mean
+suggests even larger differences.
 
 ``` r
 df <- tibble(coverage = c(as.vector(apply(t.width.m, c(2,3), median)),
@@ -543,10 +584,11 @@ df <- tibble(coverage = c(as.vector(apply(t.width.m, c(2,3), median)),
 
 df$method <- keeporder(df$method)
 
-p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
+p <- ggplot(df, aes(x = g, y = coverage, colour = method, linetype = method)) + theme_gar +
   # geom_hline(yintercept = 0.95) +
   geom_line(size = 1.5) +
   scale_color_viridis_d(end = 0.95) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
   coord_cartesian(ylim = c(.7, 1.5)) +
   scale_x_continuous(breaks = gseq, minor_breaks = NULL) +
   theme(legend.position = c(.25, .8)) +
@@ -556,13 +598,16 @@ p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-18-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 p.width.m <- p
 ```
 
-The coverage issue identified for the t-test and the percentile bootstrap seem to some extent due to too short CIs. \#\# Coverage: t-test on 20% trimmed means
+The coverage issue identified for the t-test and the percentile
+bootstrap seems to some extent due to too short CIs.
+
+## Coverage: t-test on 20% trimmed means
 
 ### Figure: coverage
 
@@ -574,25 +619,36 @@ df <- tibble(coverage = c(as.vector(apply(t.cover.20tm, c(2,3), mean)),
 
 df$method <- keeporder(df$method)
 
-p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
+p <- ggplot(df, aes(x = g, y = coverage, colour = method, linetype = method)) + theme_gar +
   geom_hline(yintercept = 0.95) +
   geom_line(size = 1.5) +
   scale_color_viridis_d(end = 0.95) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
   coord_cartesian(ylim = c(.8, 1)) +
   scale_x_continuous(breaks = gseq, minor_breaks = NULL) +
-  theme(legend.position = c(.3, .25)) +
+  theme(legend.position = c(.45, .25),
+        legend.key.width = unit(10, "line")) +
   labs(x = "g parameter", y = "CI coverage") +
-  guides(colour = guide_legend(override.aes = list(size = 3)))
+  guides(colour = guide_legend(override.aes = list(size = 3))) +
+  # ggtitle("20% trimmed mean") +
+  # theme(plot.title = element_text(size = 16, face = "bold", vjust = - 8, hjust = 0.02))
+  annotate(geom = "label", x = 0, y = 0.99, label = "20% trimmed mean ", size = 7, hjust = 0,
+           colour = "white", fill = "black", fontface = "bold")
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-19-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 p.coverage.20tm <- p
 ```
 
-The low coverage observed in the previous simulations can be addressed by making inferences about the 20% trimmed mean instead of the mean. In that situation, all methods perform similarly, with near 95% coverage in all conditions. The t-test on trimmed means performs slightly less well than the others in the conditions with the most skewness. The two types of bootstrap-t CIs overall have the coverage closest to 95%.
+The low coverage observed in the previous simulations can be addressed
+by making inferences about the 20% trimmed mean instead of the mean. In
+that situation, all methods perform similarly, with near 95% coverage in
+all conditions. The t-test on trimmed means performs slightly less well
+than the others in the conditions with the most skewness. The two types
+of bootstrap-t CIs overall have coverage closest to 95%.
 
 ### Figure: width
 
@@ -604,10 +660,11 @@ df <- tibble(coverage = c(as.vector(apply(t.width.20tm, c(2,3), mean)),
 
 df$method <- keeporder(df$method)
 
-p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
+p <- ggplot(df, aes(x = g, y = coverage, colour = method, linetype = method)) + theme_gar +
   # geom_hline(yintercept = 0.95) +
   geom_line(size = 1.5) +
   scale_color_viridis_d(end = 0.95) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
   coord_cartesian(ylim = c(.7, 1.5)) +
   scale_x_continuous(breaks = gseq, minor_breaks = NULL) +
   theme(legend.position = c(.25, .8)) +
@@ -616,16 +673,18 @@ p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
 p.width.20tm <- p
 ```
 
-Again the bootstrap-t CIs tended to be quite larger than the t-test and bootstrap ones. So when sampling from very skewed distributions and making inferences about 20% trimmed means, it could be beneficial to use the percentile bootstrap over other methods.
+Again the bootstrap-t CIs tended to be quite larger than the t-test and
+bootstrap ones. So when sampling from very skewed distributions and
+making inferences about 20% trimmed means, it could be beneficial to use
+the percentile bootstrap over other methods.
 
-Coverage: t-test on 10% trimmed means
--------------------------------------
+## Coverage: t-test on 10% trimmed means
 
 Trimming only 10% gives similar results.
 
@@ -639,19 +698,24 @@ df <- tibble(coverage = c(as.vector(apply(t.cover.10tm, c(2,3), mean)),
 
 df$method <- keeporder(df$method)
 
-p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
+p <- ggplot(df, aes(x = g, y = coverage, colour = method, linetype = method)) + theme_gar +
   geom_hline(yintercept = 0.95) +
   geom_line(size = 1.5) +
   scale_color_viridis_d(end = 0.95) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
   coord_cartesian(ylim = c(.8, 1)) +
   scale_x_continuous(breaks = gseq, minor_breaks = NULL) +
   theme(legend.position = c(.3, .25)) +
   labs(x = "g parameter", y = "CI coverage") +
-  guides(colour = guide_legend(override.aes = list(size = 3)))
+  guides(colour = guide_legend(override.aes = list(size = 3))) +
+  # ggtitle("10% trimmed mean") +
+  # theme(plot.title = element_text(size = 16, face = "bold", vjust = - 8, hjust = 0.02))
+  annotate(geom = "label", x = 0, y = 0.99, label = "10% trimmed mean ", size = 7, hjust = 0,
+           colour = "white", fill = "black", fontface = "bold")
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-21-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 p.coverage.10tm <- p
@@ -667,10 +731,11 @@ df <- tibble(coverage = c(as.vector(apply(t.width.10tm, c(2,3), mean)),
 
 df$method <- keeporder(df$method)
 
-p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
+p <- ggplot(df, aes(x = g, y = coverage, colour = method, linetype = method)) + theme_gar +
   # geom_hline(yintercept = 0.95) +
   geom_line(size = 1.5) +
   scale_color_viridis_d(end = 0.95) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
   coord_cartesian(ylim = c(.7, 1.5)) +
   scale_x_continuous(breaks = gseq, minor_breaks = NULL) +
   theme(legend.position = c(.25, .8)) +
@@ -679,14 +744,13 @@ p <- ggplot(df, aes(x = g, y = coverage, colour = method)) + theme_gar +
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-22-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ``` r
 p.width.10tm <- p
 ```
 
-Summary figure
---------------
+## Summary figure
 
 ``` r
 left.panel <- cowplot::plot_grid(p.g, 
@@ -730,13 +794,12 @@ cowplot::plot_grid(left.panel, right.panel,
 
 # save figure
 ggsave(filename=('./figures/figure_ptb.pdf'),width=20,height=15)
+ggsave(filename=('./figures/figure13.pdf'),width=20,height=15)
 ```
 
-Explain bootstrap-t procedure
-=============================
+# Explain bootstrap-t procedure
 
-Get sample
-----------
+## Get sample
 
 ``` r
 set.seed(21)
@@ -748,8 +811,7 @@ samp.20tm <- mean(samp, trim = 0.2) # sample 20% trimmed mean
 samp.se20tm <- trimse(samp, tr = 0.2) # sample estimation of the standard error of the 20% trimmed mean
 ```
 
-Illustrate procedure for the mean
----------------------------------
+## Illustrate procedure for the mean
 
 ### Sample
 
@@ -776,7 +838,7 @@ pA1 <- p
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-25-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ### Mean centred sample
 
@@ -810,11 +872,12 @@ pA2 <- p
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-26-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 ### Bootstrap sampling distribution of *T* values
 
-Bootstrap mean centred sample (mean = zero), to derive a sampling distribution of *T* values under the null hypothesis.
+Bootstrap mean centred sample (mean = zero), to derive a sampling
+distribution of *T* values under the null hypothesis.
 
 **Compute**
 
@@ -839,7 +902,7 @@ CI.up <- round(samp.m + abootT.q * samp.sem, digits = 2)
 print(paste0("Symmetric CI = [",CI.lo,", ",CI.up,"]"))
 ```
 
-    ## [1] "Symmetric CI = [-0.4, 1.62]"
+    ## [1] "Symmetric CI = [-0.34, 1.56]"
 
 ``` r
 # Asymmetric CI
@@ -848,7 +911,7 @@ CI.up <- round(samp.m - bootT.q[1] * samp.sem, digits = 2)
 print(paste0("Asymmetric CI = [",CI.lo,", ",CI.up,"]"))
 ```
 
-    ## [1] "Asymmetric CI = [0.08, 1.87]"
+    ## [1] "Asymmetric CI = [0.07, 1.95]"
 
 **Illustrate**
 
@@ -889,14 +952,16 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
    label = expression(bold("CI"["up"]*" = m - q"["0.025"]*" * SEM"))) +
   # title
   ggtitle("Asymmetric method") +
-  theme(plot.title = element_text(hjust=0.02, vjust=-10, face='bold')) +
+  theme(plot.title = element_text(hjust=0.02, vjust=-10, face='bold'),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   scale_x_continuous(breaks = seq(-12, 4, 2)) +
   coord_cartesian(xlim = c(-11, 5))
 
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-29-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 ``` r
 pA3 <- p
@@ -928,21 +993,22 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
     label = expression(bold("CI = m \u00B1 q"["0.95"]*" * SEM"))) +
   # title
   ggtitle("Symmetric method") +
-  theme(plot.title = element_text(hjust=0.2, vjust=-10, face='bold')) +
+  theme(plot.title = element_text(hjust=0.2, vjust=-10, face='bold'),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   scale_x_continuous(breaks = seq(-2, 10, 2)) +
   coord_cartesian(xlim = c(0, 11))
 
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-30-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 ``` r
 pA4 <- p
 ```
 
-Illustrate procedure for the 20% trimmed mean
----------------------------------------------
+## Illustrate procedure for the 20% trimmed mean
 
 ### Sample
 
@@ -970,7 +1036,7 @@ pB1 <- p
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-31-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 ### Trimmed mean centred sample
 
@@ -1000,7 +1066,7 @@ pB2 <- p
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-32-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
 ### Bootstrap sampling distribution of *T* values
 
@@ -1027,7 +1093,7 @@ CI.up <- round(samp.20tm + abootT.q * samp.se20tm, digits = 2)
 print(paste0("Symmetric CI = [",CI.lo,", ",CI.up,"]"))
 ```
 
-    ## [1] "Symmetric CI = [-0.36, 0.59]"
+    ## [1] "Symmetric CI = [-0.34, 0.57]"
 
 ``` r
 # Asymmetric CI
@@ -1036,9 +1102,10 @@ CI.up <- round(samp.20tm - bootT.q[1] * samp.se20tm, digits = 2)
 print(paste0("Asymmetric CI = [",CI.lo,", ",CI.up,"]"))
 ```
 
-    ## [1] "Asymmetric CI = [-0.3, 0.67]"
+    ## [1] "Asymmetric CI = [-0.28, 0.62]"
 
-**Illustrate** Note how trimming reduces the skewness of the *T* sampling distribution.
+**Illustrate** Note how trimming reduces the skewness of the *T*
+sampling distribution.
 
 ``` r
 df <- as_tibble(with(density(bootT), data.frame(x,y)))
@@ -1077,14 +1144,16 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
     label = expression(bold("CI"["up"]*" = m - q"["0.025"]*" * SEM"))) +
   # title
   ggtitle("Asymmetric method") +
-  theme(plot.title = element_text(hjust=0.02, vjust=-10, face='bold')) +
+  theme(plot.title = element_text(hjust=0.02, vjust=-10, face='bold'),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   scale_x_continuous(breaks = seq(-12, 4, 2)) +
   coord_cartesian(xlim = c(-11, 5))
 
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-35-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
 
 ``` r
 pB3 <- p
@@ -1116,21 +1185,22 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
     label = expression(bold("CI = m \u00B1 q"["0.95"]*" * SEM"))) +
   # title
   ggtitle("Symmetric method") +
-  theme(plot.title = element_text(hjust=0.25, vjust=-10, face='bold')) +
+  theme(plot.title = element_text(hjust=0.25, vjust=-10, face='bold'),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   scale_x_continuous(breaks = seq(-2, 10, 1)) +
   coord_cartesian(xlim = c(0, 11))
 
 p
 ```
 
-![](ptb_files/figure-markdown_github/unnamed-chunk-36-1.png)
+![](ptb_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
 
 ``` r
 pB4 <- p
 ```
 
-Summary figure
-==============
+# Summary figure
 
 ``` r
 top.panel <- cowplot::plot_grid(pA1, pA2, pA3, pA4,
@@ -1163,4 +1233,5 @@ cowplot::plot_grid(top.panel, bottom.panel,
 
 # save figure
 ggsave(filename=('./figures/figure_ptb_explained.pdf'),width=20,height=10)
+ggsave(filename=('./figures/figure14.pdf'),width=20,height=10)
 ```

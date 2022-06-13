@@ -1,10 +1,9 @@
 Percentile bootstrap
 ================
 Guillaume A. Rousselet
-2019-05-27
+2022-06-13
 
-Dependencies
-============
+# Dependencies
 
 ``` r
 library(tibble)
@@ -18,13 +17,13 @@ source("./functions/theme_gar.txt")
 sessionInfo()
 ```
 
-    ## R version 3.5.2 (2018-12-20)
-    ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.4
+    ## R version 4.2.0 (2022-04-22)
+    ## Platform: x86_64-apple-darwin17.0 (64-bit)
+    ## Running under: macOS Catalina 10.15.7
     ## 
     ## Matrix products: default
-    ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
     ## 
     ## locale:
     ## [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
@@ -33,27 +32,30 @@ sessionInfo()
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] ggplot2_3.1.1 tibble_2.1.1 
+    ## [1] ggplot2_3.3.6 tibble_3.1.7 
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_1.0.1       knitr_1.21       magrittr_1.5     tidyselect_0.2.5
-    ##  [5] munsell_0.5.0    colorspace_1.4-1 R6_2.4.0         rlang_0.3.4     
-    ##  [9] stringr_1.4.0    plyr_1.8.4       dplyr_0.8.0.1    tools_3.5.2     
-    ## [13] grid_3.5.2       gtable_0.3.0     xfun_0.4         withr_2.1.2     
-    ## [17] htmltools_0.3.6  yaml_2.2.0       lazyeval_0.2.2   digest_0.6.18   
-    ## [21] assertthat_0.2.1 crayon_1.3.4     purrr_0.3.2      glue_1.3.1      
-    ## [25] evaluate_0.13    rmarkdown_1.11   stringi_1.4.3    compiler_3.5.2  
-    ## [29] pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
+    ##  [1] rstudioapi_0.13  knitr_1.39       magrittr_2.0.3   tidyselect_1.1.2
+    ##  [5] munsell_0.5.0    colorspace_2.0-3 R6_2.5.1         rlang_1.0.2     
+    ##  [9] fastmap_1.1.0    fansi_1.0.3      dplyr_1.0.9      stringr_1.4.0   
+    ## [13] tools_4.2.0      grid_4.2.0       gtable_0.3.0     xfun_0.31       
+    ## [17] utf8_1.2.2       cli_3.3.0        withr_2.5.0      htmltools_0.5.2 
+    ## [21] ellipsis_0.3.2   yaml_2.3.5       digest_0.6.29    lifecycle_1.0.1 
+    ## [25] crayon_1.5.1     purrr_0.3.4      vctrs_0.4.1      glue_1.6.2      
+    ## [29] evaluate_0.15    rmarkdown_2.14   stringi_1.7.6    compiler_4.2.0  
+    ## [33] pillar_1.7.0     generics_0.1.2   scales_1.2.0     pkgconfig_2.0.3
 
-Bootstrap implementation
-========================
+# Bootstrap implementation
 
-Let's look at how the bootstrap is implemented in the one-sample case. See an interactive demo [here](https://seeing-theory.brown.edu/frequentist-inference/index.html#section2).
+Let’s look at how the bootstrap is implemented in the one-sample case.
+See an interactive demo
+[here](https://seeing-theory.brown.edu/frequentist-inference/index.html#section2).
 
-Sampling with replacement
--------------------------
+## Sampling with replacement
 
-Test the `sample()` function. Let say our sample is a sequence of integers. We sample with replacement from that sequence of numbers. Execute chunk several times to see what happens.
+Test the `sample()` function. Let say our sample is a sequence of
+integers. We sample with replacement from that sequence of numbers.
+Execute chunk several times to see what happens.
 
 ``` r
 n <- 10 # sample size
@@ -62,7 +64,7 @@ boot.samp <- sample(samp, n, replace = TRUE) # sample with replacement
 boot.samp
 ```
 
-    ##  [1] 3 5 1 3 5 6 9 7 5 8
+    ##  [1]  3 10  4  6  9  9  1 10  5  8
 
 Generate 3 bootstrap samples for the article:
 
@@ -75,12 +77,11 @@ matrix(sample(samp, n*nboot, replace = TRUE), nrow = nboot)
 ```
 
     ##      [,1] [,2] [,3] [,4] [,5] [,6]
-    ## [1,]    5    2    1    6    1    1
-    ## [2,]    2    6    2    5    4    4
-    ## [3,]    5    6    6    6    2    2
+    ## [1,]    1    2    3    6    3    3
+    ## [2,]    3    5    4    6    6    4
+    ## [3,]    1    3    2    6    2    5
 
-Loop
-----
+## Loop
 
 ``` r
 set.seed(21) # reproducible results
@@ -140,11 +141,15 @@ ggplot(df, aes(x = cond, y = res)) + theme_linedraw() +
   annotate("text", x = 0.75, y = samp.tm, label = 'bold("Trimmed\nmean")', size = 4, colour = "blue", parse = TRUE)
 ```
 
-![](pb_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](pb_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ### Plot distributions of bootstrap estimates
 
-The distribution of bootstrap medians is multi-modal and very different from that of the mean and the 20% trimmed mean. To compute confidence intervals for the median in the one-sample case, it is recommended to use the parametric approach implemented in the function `sint()`.
+The distribution of bootstrap medians is multi-modal and very different
+from that of the mean and the 20% trimmed mean. To compute confidence
+intervals for the median in the one-sample case, it is recommended to
+use the parametric approach implemented in the function `sint()`
+available in the file *./functions/Rallfun-v40.txt* in this repository.
 
 ``` r
 df <- tibble(res = c(boot.m, boot.tm, boot.md),
@@ -153,17 +158,18 @@ df <- tibble(res = c(boot.m, boot.tm, boot.md),
 ggplot(df, aes(x = res, colour = est)) + theme_gar +
   geom_line(aes(y = ..density..), stat = "density", size = 1) +
   labs(x = "Bootstrap estimates", y = "Density") + 
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
 ```
 
-![](pb_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](pb_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
   # ggtitle("Boostrap samples")
 ```
 
-Matrix
-------
+## Matrix
 
 ``` r
 set.seed(21) # reproducible results
@@ -176,16 +182,24 @@ boot.m <- apply(boot.samp, 1, mean)
 boot.md <- apply(boot.samp, 1, median)
 ```
 
-Functions
----------
+## Functions
 
-Examples of R packages for bootstrap inferences: - [`boot`](https://www.statmethods.net/advstats/bootstrapping.html) - [`resample`](https://cran.r-project.org/web/packages/resample/index.html) - [`bootstrap`](https://cran.r-project.org/web/packages/bootstrap/index.html) - [`WRS2`](https://cran.r-project.org/web/packages/WRS2/index.html)
+Examples of R packages for bootstrap inferences:
 
-Functions from [Rand Wilcox](https://dornsife.usc.edu/labs/rwilcox/software/).
+-   [`boot`](https://www.statmethods.net/advstats/bootstrapping.html)
+
+-   [`resample`](https://cran.r-project.org/web/packages/resample/index.html)
+
+-   [`bootstrap`](https://cran.r-project.org/web/packages/bootstrap/index.html)
+
+-   [`WRS2`](https://cran.r-project.org/web/packages/WRS2/index.html)
+
+Functions from [Rand
+Wilcox](https://dornsife.usc.edu/labs/rwilcox/software/).
 
 ``` r
 # TO USE THE FUNCTIONS, FIRST USE THE SOURCE COMMAND:
-# source('./functions/Rallfun-v35.txt')
+# source('./functions/Rallfun-v40.txt')
 
 set.seed(1) # reproducible results
 onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0)
@@ -202,11 +216,9 @@ trimpb()
 hdpb()
 ```
 
-Generate sample from lognormal distribution
-===========================================
+# Generate sample from lognormal distribution
 
-Illustrate population
----------------------
+## Illustrate population
 
 Lognormal distribution from the which the sample is taken.
 
@@ -218,14 +230,15 @@ df <- tibble(x = x, y = y)
 
 p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
   geom_line(size = 1.5, colour = "orange") +
-  labs(x = "Values", y = "Density")
+  labs(x = "Values", y = "Density") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
 p
 ```
 
-![](pb_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](pb_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-Get sample
-----------
+## Get sample
 
 ``` r
 set.seed(21) # reproducible example
@@ -235,8 +248,7 @@ sdlog <- 1
 samp <- rlnorm(n, meanlog = meanlog, sdlog = sdlog) # random sample
 ```
 
-Illustrate sample
------------------
+## Illustrate sample
 
 ``` r
 set.seed(21) # for reproducible jitter
@@ -264,17 +276,17 @@ p <- ggplot(data = df, aes(x = cond, y = pc)) + theme_gar +
 p
 ```
 
-![](pb_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](pb_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 pA <- p
 ```
 
-Standard confidence interval
-============================
+Sample mean = 1.61
 
-T-value: define function
-------------------------
+# Standard confidence interval
+
+## T-value: define function
 
 ``` r
 # mean minus null value divided by SEM
@@ -284,12 +296,11 @@ tval <- function(x,nv){
 }
 ```
 
-P value
--------
+## P value
 
 Let say our hypothesis is mu = 2.
 
-First, let's use the function:
+First, let’s use the function:
 
 ``` r
 mu <- 2 # null hypothesis
@@ -307,8 +318,7 @@ dof <- length(samp)-1 # degrees of freedom
 
     ## [1] 0.2667699
 
-Illustrate theoretical *T* distribution
----------------------------------------
+## Illustrate theoretical *T* distribution
 
 ``` r
 alpha <- 0.05
@@ -317,7 +327,9 @@ p <- ggplot(data.frame(x = c(-5, 5)), aes(x)) + theme_gar +
   labs(y = "Density") +
   theme(axis.text = element_text(size = 14),
         axis.title = element_text(size = 16),
-        plot.title = element_text(size=20)) +
+        plot.title = element_text(size=20),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   labs(x = "T values") +
   ggtitle(substitute(paste(italic(T)," distribution with ",dof," degrees of freedom"), list(dof=dof))) +
   # area under the curve -> p value
@@ -370,10 +382,9 @@ pB <- p
 p
 ```
 
-![](pb_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](pb_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
-Compute confidence interval
----------------------------
+## Compute confidence interval
 
 ### Using built-in function
 
@@ -401,8 +412,7 @@ ci
 
     ## [1] 0.9037929 2.3149338
 
-Generate bootstrap samples
-==========================
+# Generate bootstrap samples
 
 ``` r
 set.seed(666)
@@ -410,8 +420,7 @@ nboot <- 5000
 bootsamp <- matrix(sample(samp, nboot * n, replace = TRUE), nrow = nboot)
 ```
 
-Illustrate a few bootstrap samples
-----------------------------------
+## Illustrate a few bootstrap samples
 
 For each sample we superimpose the (bootstrap) median.
 
@@ -431,26 +440,41 @@ p <- ggplot(df, aes(y = bootid, x = res)) + theme_gar +
                size = 1.5) +
   theme(panel.grid.minor = element_blank()) +
   scale_y_continuous(breaks = seq(1, 20, 1), expand = expand_scale(mult = c(0.01, 0.01)))
+```
+
+    ## Warning: `expand_scale()` is deprecated; use `expansion()` instead.
+
+``` r
 pC <- p
 p
 ```
 
-![](pb_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](pb_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
-Illustrate bootstrap sampling distribution of the mean
-------------------------------------------------------
+## Illustrate bootstrap sampling distribution of the mean
 
 Compute confidence interval and other quantities.
 
-Here and in the rest of the tutorial, we compute bootstrap CI using `quantile(type = 6)` of the bootstrap distribution. This is recommended in this article:
+Here and in the rest of the tutorial, we compute bootstrap CI using
+`quantile(type = 6)` of the bootstrap distribution. This is recommended
+in this article:
 
-Hesterberg, Tim C. “What Teachers Should Know About the Bootstrap: Resampling in the Undergraduate Statistics Curriculum.” The American Statistician 69, no. 4 (October 2, 2015): 371–86. <https://doi.org/10.1080/00031305.2015.1089789>.
+Hesterberg, Tim C. “What Teachers Should Know About the Bootstrap:
+Resampling in the Undergraduate Statistics Curriculum.” The American
+Statistician 69, no. 4 (October 2, 2015): 371–86.
+<https://doi.org/10.1080/00031305.2015.1089789>.
 
-Rand Wilcox uses a different approach. See for instance `help(onesampb)`, in which the bounds of the CI are defined using the bootstrap distribution `bvec`, `alpha` (say = 0.05) and `nboot` (say = 1,000 bootstrap samples):
+Rand Wilcox uses a different approach. See for instance
+`help(onesampb)`, in which the bounds of the CI are defined using the
+bootstrap distribution `bvec`, `alpha` (say = 0.05) and `nboot` (say =
+1,000 bootstrap samples):
 
-`low <- round((alpha/2)*nboot)` `up <- nboot-low` `low <- low+1` `ci_lower_bound <- bvec[low]` `ci_upper_bound <- bvec[up]`
+`low <- round((alpha/2)*nboot)` `up <- nboot-low` `low <- low+1`
+`ci_lower_bound <- bvec[low]` `ci_upper_bound <- bvec[up]`
 
-In practice it is unclear if these choices make any difference. What we know if that with `nboot` large enough, the choice of quantile method should make virtually no difference.
+In practice it is unclear if these choices make any difference. What we
+know is that with `nboot` large enough, the choice of quantile method
+should make virtually no difference.
 
 ``` r
 # bootstrap means
@@ -464,16 +488,32 @@ pv <- mean(bootm < mu) # + .5*mean(bootsamp==mu)
 pv <- 2 * min(c(pv, 1-pv))
 ```
 
-Alternatively, we could compute a highest density interval (HDI)
+Bootstrap 95% CI = \[1.02, 2.38\]  
+Bootstrap estimate of the SEM = 1.86  
+Bootstrap *P* value (hypothesis = 2) = 0.276
+
+Alternatively, we could compute a highest density interval (HDI):
 
 ``` r
 require(HDInterval)
 boothdi <- HDInterval::hdi(bootm)
 ```
 
-We illustrate the distribution of the bootstrap samples, from which we derive four elements: - confidence/compatibility interval - p value - bootstrap estimate of the standard error (SE) - bootstrap estimate of bias The distribution is also our best estimate of the shape the sampling distribution of the median, given the data and our model.
+We illustrate the distribution of the bootstrap samples, from which we
+derive four elements:
 
-Make data frame
+-   confidence/compatibility interval
+
+-   p value
+
+-   bootstrap estimate of the standard error (SE)
+
+-   bootstrap estimate of bias
+
+The distribution is also our best estimate of the shape the sampling
+distribution of the median, given the data and our model.
+
+### Make data frame
 
 ``` r
 df <- as_tibble(with(density(bootm),data.frame(x,y)))
@@ -482,13 +522,15 @@ df.pv <- tibble(x = df$x[df$x>mu],
                 y = df$y[df$x>mu])
 ```
 
-Figure
+### Figure
 
 ``` r
 p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
       # geom_line(stat = "density") +
   labs(x = "Bootstrap means",
        y = "Density") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   # P value
   geom_area(data = df.pv,
             aes(x = x, y = y),
@@ -545,14 +587,13 @@ p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
 p
 ```
 
-![](pb_files/figure-markdown_github/unnamed-chunk-24-1.png)
+![](pb_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
 pD <- p
 ```
 
-Summary figure
-==============
+# Summary figure
 
 ``` r
 p1 <- cowplot::plot_grid(pA, pB,
@@ -587,4 +628,5 @@ cowplot::plot_grid(p1, p2,
 
 # save figure
 ggsave(filename=('./figures/figure_pb.pdf'),width=15,height=15)
+ggsave(filename=('./figures/figure1.pdf'),width=15,height=15)
 ```

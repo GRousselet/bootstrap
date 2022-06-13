@@ -3,15 +3,15 @@ title: "Percentile bootstrap"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
-    github_document:
-    html_preview: yes
+  pdf_document:
+    fig_caption: no
+    number_sections: no
     toc: yes
     toc_depth: 2
+    # github_document:
+    # html_preview: yes
+    # toc: yes
+    # toc_depth: 2
 ---
 
 # Dependencies
@@ -82,7 +82,7 @@ samp.md
 ```
 
 ### Plot original results
-```{r, fig.width=2}
+```{r, fig.width=3}
 set.seed(1)
 df <- tibble(cond = factor(rep(1,n)),
              res = samp) 
@@ -94,13 +94,15 @@ ggplot(df, aes(x = cond, y = res)) + theme_linedraw() +
   # stat_summary(fun.y=median, geom="line")
   geom_segment(aes(x = 0.9, y = samp.m, xend = 1.1, yend = samp.m)) +
   geom_segment(aes(x = 0.9, y = samp.md, xend = 1.1, yend = samp.md), colour = "orange") +
-  annotate("text", x = 1.2, y = samp.m, label = "Mean", size = 3) +
-  annotate("text", x = 1.2, y = samp.md, label = "Median", size = 3, colour = "orange")
+  geom_segment(aes(x = 0.9, y = samp.tm, xend = 1.1, yend = samp.tm), colour = "blue") +
+  annotate("text", x = 1.185, y = samp.m-0.1, label = 'bold("Mean")', size = 4, parse = TRUE) +
+  annotate("text", x = 1.2, y = samp.md+0.1, label = 'bold("Median")', size = 4, colour = "orange", parse = TRUE) +
+  annotate("text", x = 0.75, y = samp.tm, label = 'bold("Trimmed\nmean")', size = 4, colour = "blue", parse = TRUE)
 ```
 
 ### Plot distributions of bootstrap estimates
 
-The distribution of bootstrap medians is multi-modal and very different from that of the mean and the 20% trimmed mean. To compute confidence intervals for the median in the one-sample case, it is recommended to use the parametric approach implemented in the function `sint()`.
+The distribution of bootstrap medians is multi-modal and very different from that of the mean and the 20% trimmed mean. To compute confidence intervals for the median in the one-sample case, it is recommended to use the parametric approach implemented in the function `sint()` available in the file *./functions/Rallfun-v40.txt* in this repository.
 
 ```{r}
 df <- tibble(res = c(boot.m, boot.tm, boot.md),
@@ -109,7 +111,9 @@ df <- tibble(res = c(boot.m, boot.tm, boot.md),
 ggplot(df, aes(x = res, colour = est)) + theme_gar +
   geom_line(aes(y = ..density..), stat = "density", size = 1) +
   labs(x = "Bootstrap estimates", y = "Density") + 
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
   # ggtitle("Boostrap samples")
 ```
 
@@ -127,17 +131,21 @@ boot.md <- apply(boot.samp, 1, median)
 
 ## Functions
 
-Examples of R packages for bootstrap inferences:
-- [`boot`](https://www.statmethods.net/advstats/bootstrapping.html) 
-- [`resample`](https://cran.r-project.org/web/packages/resample/index.html)
-- [`bootstrap`](https://cran.r-project.org/web/packages/bootstrap/index.html)
-- [`WRS2`](https://cran.r-project.org/web/packages/WRS2/index.html)
+Examples of R packages for bootstrap inferences:  
+
+- [`boot`](https://www.statmethods.net/advstats/bootstrapping.html)  
+
+- [`resample`](https://cran.r-project.org/web/packages/resample/index.html)  
+
+- [`bootstrap`](https://cran.r-project.org/web/packages/bootstrap/index.html)  
+
+- [`WRS2`](https://cran.r-project.org/web/packages/WRS2/index.html)  
 
 Functions from [Rand Wilcox](https://dornsife.usc.edu/labs/rwilcox/software/).
 
 ```{r, eval = FALSE}
 # TO USE THE FUNCTIONS, FIRST USE THE SOURCE COMMAND:
-# source('./functions/Rallfun-v35.txt')
+# source('./functions/Rallfun-v40.txt')
 
 set.seed(1) # reproducible results
 onesampb(samp, est=mean, alpha=0.1, nboot=1000, SEED = FALSE, nv = 0)
@@ -167,7 +175,9 @@ df <- tibble(x = x, y = y)
 
 p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
   geom_line(size = 1.5, colour = "orange") +
-  labs(x = "Values", y = "Density")
+  labs(x = "Values", y = "Density") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
 p
 ```
 
@@ -208,6 +218,8 @@ p
 pA <- p
 ```
 
+Sample mean = `r round(mean(samp), digits=2)`  
+
 # Standard confidence interval
 
 ## T-value: define function
@@ -242,7 +254,9 @@ p <- ggplot(data.frame(x = c(-5, 5)), aes(x)) + theme_gar +
   labs(y = "Density") +
   theme(axis.text = element_text(size = 14),
         axis.title = element_text(size = 16),
-        plot.title = element_text(size=20)) +
+        plot.title = element_text(size=20),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   labs(x = "T values") +
   ggtitle(substitute(paste(italic(T)," distribution with ",dof," degrees of freedom"), list(dof=dof))) +
   # area under the curve -> p value
@@ -362,7 +376,7 @@ Rand Wilcox uses a different approach. See for instance `help(onesampb)`, in whi
 `ci_lower_bound <- bvec[low]`
 `ci_upper_bound <- bvec[up]`
 
-In practice it is unclear if these choices make any difference. What we know if that with `nboot` large enough, the choice of quantile method should make virtually no difference.
+In practice it is unclear if these choices make any difference. What we know is that with `nboot` large enough, the choice of quantile method should make virtually no difference.
 
 ```{r}
 # bootstrap means
@@ -376,20 +390,29 @@ pv <- mean(bootm < mu) # + .5*mean(bootsamp==mu)
 pv <- 2 * min(c(pv, 1-pv))
 ```
 
-Alternatively, we could compute a highest density interval (HDI)
+Bootstrap 95% CI = [`r round(bootci[1], digits=2)`, `r round(bootci[2], digits=2)`]  
+Bootstrap estimate of the SEM = `r round(bootsamp.sd, digits=2)`  
+Bootstrap *P* value (hypothesis = 2) = `r pv`  
+
+Alternatively, we could compute a highest density interval (HDI):
 ```{r, eval = FALSE}
 require(HDInterval)
 boothdi <- HDInterval::hdi(bootm)
 ```
 
-We illustrate the distribution of the bootstrap samples, from which we derive four elements:
-- confidence/compatibility interval
-- p value
-- bootstrap estimate of the standard error (SE)
-- bootstrap estimate of bias
+We illustrate the distribution of the bootstrap samples, from which we derive four elements:  
+
+- confidence/compatibility interval  
+
+- p value  
+
+- bootstrap estimate of the standard error (SE)  
+
+- bootstrap estimate of bias  
+
 The distribution is also our best estimate of the shape the sampling distribution of the median, given the data and our model.
 
-Make data frame
+### Make data frame
 ```{r}
 df <- as_tibble(with(density(bootm),data.frame(x,y)))
 
@@ -397,12 +420,14 @@ df.pv <- tibble(x = df$x[df$x>mu],
                 y = df$y[df$x>mu])
 ```
 
-Figure
+### Figure
 ```{r}
 p <- ggplot(df, aes(x = x, y = y)) + theme_gar +
       # geom_line(stat = "density") +
   labs(x = "Bootstrap means",
        y = "Density") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   # P value
   geom_area(data = df.pv,
             aes(x = x, y = y),
@@ -494,4 +519,5 @@ cowplot::plot_grid(p1, p2,
 
 # save figure
 ggsave(filename=('./figures/figure_pb.pdf'),width=15,height=15)
+ggsave(filename=('./figures/figure1.pdf'),width=15,height=15)
 ```

@@ -3,15 +3,15 @@ title: "Compare two independent groups"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
-    github_document:
-    html_preview: yes
+  pdf_document:
+    fig_caption: no
+    number_sections: no
     toc: yes
     toc_depth: 2
+    # github_document:
+    # html_preview: yes
+    # toc: yes
+    # toc_depth: 2
 ---
 
 # Dependencies
@@ -20,7 +20,7 @@ library(tibble)
 library(ggplot2)
 # library(cowplot)
 source("./functions/theme_gar.txt")
-source("./functions/Rallfun-v35.txt")
+source("./functions/Rallfun-v40.txt")
 source("./functions/functions.txt")
 ```
 
@@ -61,7 +61,9 @@ p <- ggplot(as.tibble(x), aes(x = x)) + theme_gar +
   labs(x = "Values", y = "Density") +
   scale_colour_manual(name = "", values = c("Lognormal(0, 0.5)" = "orange",
                                             "Lognormal(0.2, 0.7)" = "purple")) +
-  theme(legend.position = c(.6, .8)) +
+  theme(legend.position = c(.6, .8),
+        axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank()) +
   guides(colour = guide_legend(override.aes = list(size = 3)))
 p.pop <- p
 p
@@ -165,6 +167,7 @@ p <- ggplot(df, aes(x = res, xend = res, y = bootid - 0.4, yend = bootid + 0.4))
 pA2 <- p
 p
 ```
+population normalised difference = `r round(normdiff(q3(samp1),q3(samp2)), digits = 2)`
 
 Thick grey vertical line = difference between 3rd quartiles.
 Vertical dashed line = zero reference line.
@@ -276,6 +279,8 @@ p <- ggplot(df, aes(x = x)) + theme_gar +
                lineend = "round", size = 2, colour = "black") +
   labs(x = "Bootstrap quantiles",
        y = "Density") +
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank()) +
   facet_grid(cols = vars(gp))
 p
 pC1 <- p
@@ -288,11 +293,13 @@ samp.nd <- normdiff(q3(samp1), q3(samp2))
 df <- tibble(x = bootdiff)
 
 p <- ggplot(df, aes(x = x)) + theme_gar +
+  # sample 3rd quartile: vertical line
+  geom_vline(xintercept = samp.nd, linetype = 'solid', size = 2, colour = "grey") +
       geom_line(stat = "density", size = 1) +
   labs(x = "Bootstrap differences",
        y = "Density") +
-  # sample 3rd quartile: vertical line
-  geom_vline(xintercept = samp.nd, linetype = 'solid', size = 2, colour = "grey") +
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank()) +
   # confidence interval ----------------------
   geom_segment(x = ci.diff[1], xend = ci.diff[2],
                y = 0, yend = 0,
@@ -311,6 +318,8 @@ pC2 <- p
 
 # Make summary figure
 ```{r, eval = FALSE}
+
+pvoid <- ggplot() + theme_void() # empty plot for blank space
 
 # pA <- cowplot::plot_grid(pA1, pA2,
 #                     labels = NA,
@@ -350,7 +359,7 @@ p.LEFT <- cowplot::plot_grid(p.pop, pA1, pB1, pC1,
                     hjust = -0.5,
                     scale=.95)
 
-p.RIGHT <- cowplot::plot_grid(NULL, pA2, pB2, pC2,
+p.RIGHT <- cowplot::plot_grid(pvoid, pA2, pB2, pC2,
                     labels = NA,
                     ncol = 1,
                     nrow = 4,
@@ -374,6 +383,7 @@ cowplot::plot_grid(p.LEFT, p.RIGHT,
 
 # save figure
 ggsave(filename=('./figures/figure_2indgps.pdf'),width=17,height=15)
+ggsave(filename=('./figures/figure9.pdf'),width=17,height=15)
 ```
 
 # Confidence interval with n = 100
@@ -394,7 +404,7 @@ boot2.q3 <- apply(bootsamp2,1,q3)
 # ci2 <- quantile(boot2.q3, probs = c(alpha/2, 1-alpha/2))
 bootdiff <- normdiff(boot1.q3, boot2.q3)
 ci.diff <- quantile(bootdiff, probs = c(alpha/2, 1-alpha/2)) 
-ci.diff
+round(ci.diff, digits = 2)
 ```
 
 # Confidence interval with n = 200
@@ -415,6 +425,6 @@ boot2.q3 <- apply(bootsamp2,1,q3)
 # ci2 <- quantile(boot2.q3, probs = c(alpha/2, 1-alpha/2))
 bootdiff <- normdiff(boot1.q3, boot2.q3)
 ci.diff <- quantile(bootdiff, probs = c(alpha/2, 1-alpha/2)) 
-ci.diff
+round(ci.diff, digits = 2)
 ```
 

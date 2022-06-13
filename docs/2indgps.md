@@ -1,17 +1,16 @@
 Compare two independent groups
 ================
 Guillaume A. Rousselet
-2019-05-25
+2022-06-13
 
-Dependencies
-============
+# Dependencies
 
 ``` r
 library(tibble)
 library(ggplot2)
 # library(cowplot)
 source("./functions/theme_gar.txt")
-source("./functions/Rallfun-v35.txt")
+source("./functions/Rallfun-v40.txt")
 source("./functions/functions.txt")
 ```
 
@@ -19,13 +18,13 @@ source("./functions/functions.txt")
 sessionInfo()
 ```
 
-    ## R version 3.5.2 (2018-12-20)
-    ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.5
+    ## R version 4.2.0 (2022-04-22)
+    ## Platform: x86_64-apple-darwin17.0 (64-bit)
+    ## Running under: macOS Catalina 10.15.7
     ## 
     ## Matrix products: default
-    ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
     ## 
     ## locale:
     ## [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
@@ -34,19 +33,20 @@ sessionInfo()
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] ggplot2_3.1.1 tibble_2.1.1 
+    ## [1] ggplot2_3.3.6 tibble_3.1.7 
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_1.0.1       knitr_1.21       magrittr_1.5     tidyselect_0.2.5
-    ##  [5] munsell_0.5.0    colorspace_1.4-1 R6_2.4.0         rlang_0.3.4     
-    ##  [9] stringr_1.4.0    plyr_1.8.4       dplyr_0.8.0.1    tools_3.5.2     
-    ## [13] grid_3.5.2       gtable_0.3.0     xfun_0.4         withr_2.1.2     
-    ## [17] htmltools_0.3.6  yaml_2.2.0       lazyeval_0.2.2   digest_0.6.18   
-    ## [21] assertthat_0.2.1 crayon_1.3.4     purrr_0.3.2      glue_1.3.1      
-    ## [25] evaluate_0.12    rmarkdown_1.11   stringi_1.4.3    compiler_3.5.2  
-    ## [29] pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
+    ##  [1] rstudioapi_0.13  knitr_1.39       magrittr_2.0.3   tidyselect_1.1.2
+    ##  [5] munsell_0.5.0    colorspace_2.0-3 R6_2.5.1         rlang_1.0.2     
+    ##  [9] fastmap_1.1.0    fansi_1.0.3      dplyr_1.0.9      stringr_1.4.0   
+    ## [13] tools_4.2.0      grid_4.2.0       gtable_0.3.0     xfun_0.31       
+    ## [17] utf8_1.2.2       cli_3.3.0        withr_2.5.0      htmltools_0.5.2 
+    ## [21] ellipsis_0.3.2   yaml_2.3.5       digest_0.6.29    lifecycle_1.0.1 
+    ## [25] crayon_1.5.1     purrr_0.3.4      vctrs_0.4.1      glue_1.6.2      
+    ## [29] evaluate_0.15    rmarkdown_2.14   stringi_1.7.6    compiler_4.2.0  
+    ## [33] pillar_1.7.0     generics_0.1.2   scales_1.2.0     pkgconfig_2.0.3
 
-Wilcox's functions for two independent groups
+Wilcox’s functions for two independent groups
 
 ``` r
 # to compare any estimators
@@ -60,10 +60,10 @@ comvar2()
 # For robust measures of scale, use pb2gen
 ```
 
-Illustrate populations
-======================
+# Illustrate populations
 
-We sample from 2 populations that differ in skewness, leading to large differences in the tails.
+We sample from 2 populations that differ in skewness, leading to large
+differences in the tails.
 
 ``` r
 meanlog1 <- 0
@@ -81,24 +81,29 @@ p <- ggplot(as.tibble(x), aes(x = x)) + theme_gar +
   labs(x = "Values", y = "Density") +
   scale_colour_manual(name = "", values = c("Lognormal(0, 0.5)" = "orange",
                                             "Lognormal(0.2, 0.7)" = "purple")) +
-  theme(legend.position = c(.6, .8)) +
+  theme(legend.position = c(.6, .8),
+        axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank()) +
   guides(colour = guide_legend(override.aes = list(size = 3)))
 ```
 
-    ## Warning: `as.tibble()` is deprecated, use `as_tibble()` (but mind the new semantics).
-    ## This warning is displayed once per session.
+    ## Warning: `as.tibble()` was deprecated in tibble 2.0.0.
+    ## Please use `as_tibble()` instead.
+    ## The signature and semantics have changed, see `?as_tibble`.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
 
 ``` r
 p.pop <- p
 p
 ```
 
-![](2indgps_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](2indgps_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-Population normalise difference
--------------------------------
+## Population normalise difference
 
-We use samples of 100,000 values to define the population normalise difference between 3rd quartiles.
+We use samples of 100,000 values to define the population normalise
+difference between 3rd quartiles.
 
 ``` r
 set.seed(21)
@@ -107,8 +112,7 @@ normdiff(q3(rlnorm(100000, meanlog = meanlog1, sdlog = sdlog1)), q3(rlnorm(10000
 
     ## [1] -0.1666533
 
-Generate samples
-================
+# Generate samples
 
 We get 2 relatively large samples from 2 populations.
 
@@ -120,10 +124,15 @@ samp1 <- rlnorm(n1, meanlog = meanlog1, sdlog = sdlog1)
 samp2 <- rlnorm(n2, meanlog = meanlog2, sdlog = sdlog2)
 ```
 
-Instead of the traditional measures of central tendency, like the mean or the median, here we're going to estimate the 3rd quartile of the marginal distributions. This can be justified by an interest in differences among slower responses. To illustrate that with the bootstrap we can build confidence intervals for any quantity, the group estimations will be on a normalised difference of quartiles: *e**f**f**e**c**t* = (*q*3<sub>1</sub> − *q*3<sub>2</sub>)/(*q*3<sub>1</sub> + *q*3<sub>2</sub>).
+Instead of the traditional measures of central tendency, like the mean
+or the median, here we’re going to estimate the 3rd quartile of the
+marginal distributions. This can be justified by an interest in
+differences among slower responses. To illustrate that with the
+bootstrap we can build confidence intervals for any quantity, the group
+estimations will be on a normalised difference of quartiles:
+![effect = (q3_1-q3_2)/(q3_1+q3_2)](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;effect%20%3D%20%28q3_1-q3_2%29%2F%28q3_1%2Bq3_2%29 "effect = (q3_1-q3_2)/(q3_1+q3_2)").
 
-Illustrate samples
-==================
+# Illustrate samples
 
 ``` r
 set.seed(21) # for reproducible jitter
@@ -170,16 +179,16 @@ p <- ggplot(data = df, aes(x = val, y = y)) + theme_gar +
 p
 ```
 
-![](2indgps_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](2indgps_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 pA1 <- p
 ```
 
-Thick vertical line = 3rd quartile. Thin vertical line = 2nd quartile (median).
+Thick vertical line = 3rd quartile. Thin vertical line = 2nd quartile
+(median).
 
-Sample difference
------------------
+## Sample difference
 
 ### Illustrate results
 
@@ -206,12 +215,13 @@ pA2 <- p
 p
 ```
 
-![](2indgps_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](2indgps_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> population
+normalised difference = -0.15
 
-Thick grey vertical line = difference between 3rd quartiles. Vertical dashed line = zero reference line.
+Thick grey vertical line = difference between 3rd quartiles. Vertical
+dashed line = zero reference line.
 
-Generate bootstrap samples & confidence intervals
-=================================================
+# Generate bootstrap samples & confidence intervals
 
 We use 5,000 bootstrap samples.
 
@@ -222,10 +232,11 @@ bootsamp1 <- matrix(sample(samp1, nboot * n1, replace = TRUE), nrow = nboot)
 bootsamp2 <- matrix(sample(samp2, nboot * n2, replace = TRUE), nrow = nboot)
 ```
 
-Illustrate 20 bootstrap samples
--------------------------------
+## Illustrate 20 bootstrap samples
 
-For each sample we superimpose the 3rd quartile---short vertical black line. Disks = bootstrap observations. Long vertical grey lines mark the sample 3rd quartiles.
+For each sample we superimpose the 3rd quartile—short vertical black
+line. Disks = bootstrap observations. Long vertical grey lines mark the
+sample 3rd quartiles.
 
 ``` r
 nb <- 20
@@ -250,14 +261,18 @@ p <- ggplot(df, aes(y = bootid, x = res)) + theme_gar +
   theme(panel.grid.minor = element_blank()) +
   scale_y_continuous(breaks = seq(1, 20, 1), expand = expand_scale(mult = c(0.01, 0.01))) +
   facet_grid(cols = vars(gp))
+```
+
+    ## Warning: `expand_scale()` is deprecated; use `expansion()` instead.
+
+``` r
 pB1 <- p
 p
 ```
 
-![](2indgps_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](2indgps_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-Illustrate bootstrap normalised differences
--------------------------------------------
+## Illustrate bootstrap normalised differences
 
 ### Illustrate results
 
@@ -278,17 +293,20 @@ p <- ggplot(df, aes(x = res, xend = res, y = bootid - 0.4, yend = bootid + 0.4))
   geom_segment(size = 1.5) +
   theme(panel.grid.minor = element_blank()) +
   scale_y_continuous(breaks = seq(1, 20, 1), expand = expand_scale(mult = c(0.01, 0.01)))
+```
+
+    ## Warning: `expand_scale()` is deprecated; use `expansion()` instead.
+
+``` r
 pB2 <- p
 p
 ```
 
-![](2indgps_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](2indgps_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-Bootstrap distributions
-=======================
+# Bootstrap distributions
 
-Compute confidence intervals
-----------------------------
+## Compute confidence intervals
 
 ``` r
 alpha <- 0.05
@@ -300,8 +318,7 @@ bootdiff <- normdiff(boot1.q3, boot2.q3)
 ci.diff <- quantile(bootdiff, probs = c(alpha/2, 1-alpha/2)) 
 ```
 
-Bootstrap distributions of group quantiles
-------------------------------------------
+## Bootstrap distributions of group quantiles
 
 ``` r
 df <- tibble(x = c(boot1.q3, boot2.q3),
@@ -327,18 +344,19 @@ p <- ggplot(df, aes(x = x)) + theme_gar +
                lineend = "round", size = 2, colour = "black") +
   labs(x = "Bootstrap quantiles",
        y = "Density") +
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank()) +
   facet_grid(cols = vars(gp))
 p
 ```
 
-![](2indgps_files/figure-markdown_github/unnamed-chunk-13-1.png)
+![](2indgps_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 pC1 <- p
 ```
 
-Group normalised differences
-----------------------------
+## Group normalised differences
 
 ``` r
 samp.nd <- normdiff(q3(samp1), q3(samp2))
@@ -346,11 +364,13 @@ samp.nd <- normdiff(q3(samp1), q3(samp2))
 df <- tibble(x = bootdiff)
 
 p <- ggplot(df, aes(x = x)) + theme_gar +
+  # sample 3rd quartile: vertical line
+  geom_vline(xintercept = samp.nd, linetype = 'solid', size = 2, colour = "grey") +
       geom_line(stat = "density", size = 1) +
   labs(x = "Bootstrap differences",
        y = "Density") +
-  # sample 3rd quartile: vertical line
-  geom_vline(xintercept = samp.nd, linetype = 'solid', size = 2, colour = "grey") +
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank()) +
   # confidence interval ----------------------
   geom_segment(x = ci.diff[1], xend = ci.diff[2],
                y = 0, yend = 0,
@@ -366,16 +386,17 @@ p <- ggplot(df, aes(x = x)) + theme_gar +
 p
 ```
 
-![](2indgps_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](2indgps_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 pC2 <- p
 ```
 
-Make summary figure
-===================
+# Make summary figure
 
 ``` r
+pvoid <- ggplot() + theme_void() # empty plot for blank space
+
 # pA <- cowplot::plot_grid(pA1, pA2,
 #                     labels = NA,
 #                     ncol = 2,
@@ -414,7 +435,7 @@ p.LEFT <- cowplot::plot_grid(p.pop, pA1, pB1, pC1,
                     hjust = -0.5,
                     scale=.95)
 
-p.RIGHT <- cowplot::plot_grid(NULL, pA2, pB2, pC2,
+p.RIGHT <- cowplot::plot_grid(pvoid, pA2, pB2, pC2,
                     labels = NA,
                     ncol = 1,
                     nrow = 4,
@@ -438,10 +459,10 @@ cowplot::plot_grid(p.LEFT, p.RIGHT,
 
 # save figure
 ggsave(filename=('./figures/figure_2indgps.pdf'),width=17,height=15)
+ggsave(filename=('./figures/figure9.pdf'),width=17,height=15)
 ```
 
-Confidence interval with n = 100
-================================
+# Confidence interval with n = 100
 
 ``` r
 set.seed(21)
@@ -459,14 +480,13 @@ boot2.q3 <- apply(bootsamp2,1,q3)
 # ci2 <- quantile(boot2.q3, probs = c(alpha/2, 1-alpha/2))
 bootdiff <- normdiff(boot1.q3, boot2.q3)
 ci.diff <- quantile(bootdiff, probs = c(alpha/2, 1-alpha/2)) 
-ci.diff
+round(ci.diff, digits = 2)
 ```
 
-    ##         2.5%        97.5% 
-    ## -0.210203538  0.005840768
+    ##  2.5% 97.5% 
+    ## -0.21  0.01
 
-Confidence interval with n = 200
-================================
+# Confidence interval with n = 200
 
 ``` r
 set.seed(21)
@@ -484,8 +504,8 @@ boot2.q3 <- apply(bootsamp2,1,q3)
 # ci2 <- quantile(boot2.q3, probs = c(alpha/2, 1-alpha/2))
 bootdiff <- normdiff(boot1.q3, boot2.q3)
 ci.diff <- quantile(bootdiff, probs = c(alpha/2, 1-alpha/2)) 
-ci.diff
+round(ci.diff, digits = 2)
 ```
 
-    ##       2.5%      97.5% 
-    ## -0.2257941 -0.1034133
+    ##  2.5% 97.5% 
+    ## -0.22 -0.11

@@ -1,10 +1,9 @@
 Boostrap confidence intervals: coverage, width, stability, power
 ================
 Guillaume A. Rousselet
-2019-05-27
+2022-06-13
 
-Dependencies
-============
+# Dependencies
 
 ``` r
 library(tibble)
@@ -18,10 +17,10 @@ library(beepr)
 # library(cowplot)
 source("./functions/theme_gar.txt")
 source("./functions/functions.txt")
-# source("./functions/Rallfun-v35.txt")
+# source("./functions/Rallfun-v40.txt")
 
 # define viridis colourmaps
-cc4 <- viridisLite::viridis(4)
+cc4 <- viridisLite::viridis(4, end = 0.95)
 cc5 <- viridisLite::viridis(5)
 ```
 
@@ -29,13 +28,13 @@ cc5 <- viridisLite::viridis(5)
 sessionInfo()
 ```
 
-    ## R version 3.5.2 (2018-12-20)
-    ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.4
+    ## R version 4.2.0 (2022-04-22)
+    ## Platform: x86_64-apple-darwin17.0 (64-bit)
+    ## Running under: macOS Catalina 10.15.7
     ## 
     ## Matrix products: default
-    ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
     ## 
     ## locale:
     ## [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
@@ -44,32 +43,41 @@ sessionInfo()
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] beepr_1.3     rogme_0.2.1   ggplot2_3.1.1 tibble_2.1.1 
+    ## [1] beepr_1.3     rogme_0.2.1   ggplot2_3.3.6 tibble_3.1.7 
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_1.0.1        knitr_1.21        magrittr_1.5     
-    ##  [4] tidyselect_0.2.5  munsell_0.5.0     viridisLite_0.3.0
-    ##  [7] colorspace_1.4-1  R6_2.4.0          rlang_0.3.4      
-    ## [10] stringr_1.4.0     plyr_1.8.4        dplyr_0.8.0.1    
-    ## [13] tools_3.5.2       grid_3.5.2        gtable_0.3.0     
-    ## [16] xfun_0.4          audio_0.1-5.1     withr_2.1.2      
-    ## [19] htmltools_0.3.6   yaml_2.2.0        lazyeval_0.2.2   
-    ## [22] digest_0.6.18     assertthat_0.2.1  crayon_1.3.4     
-    ## [25] purrr_0.3.2       glue_1.3.1        evaluate_0.13    
-    ## [28] rmarkdown_1.11    stringi_1.4.3     compiler_3.5.2   
-    ## [31] pillar_1.3.1      scales_1.0.0      pkgconfig_2.0.2
+    ##  [1] pillar_1.7.0      compiler_4.2.0    tools_4.2.0       digest_0.6.29    
+    ##  [5] viridisLite_0.4.0 evaluate_0.15     lifecycle_1.0.1   gtable_0.3.0     
+    ##  [9] pkgconfig_2.0.3   rlang_1.0.2       cli_3.3.0         rstudioapi_0.13  
+    ## [13] yaml_2.3.5        xfun_0.31         fastmap_1.1.0     withr_2.5.0      
+    ## [17] stringr_1.4.0     dplyr_1.0.9       knitr_1.39        generics_0.1.2   
+    ## [21] vctrs_0.4.1       grid_4.2.0        tidyselect_1.1.2  glue_1.6.2       
+    ## [25] R6_2.5.1          fansi_1.0.3       rmarkdown_2.14    purrr_0.3.4      
+    ## [29] magrittr_2.0.3    scales_1.2.0      ellipsis_0.3.2    htmltools_0.5.2  
+    ## [33] colorspace_2.0-3  utf8_1.2.2        stringi_1.7.6     munsell_0.5.0    
+    ## [37] crayon_1.5.1      audio_0.1-10
 
-We look at coverage and the width of one-sample bootstrap confidence intervals for different quantities: - mean - 20% trimmed mean - median - Harrell-Davis estimator of the 50th quantile
+We look at coverage and the width of one-sample bootstrap confidence
+intervals for different quantities:  
+- mean  
+- 20% trimmed mean  
+- median  
+- Harrell-Davis estimator of the 50th quantile
 
-We sample from a lognormal distribution. For simplicity, we consider only two cases, in which keep the sample size constant (n=30) and vary the number of bootstrap samples `nboot` from 500 to 10000 in steps of 500, or we use 2000 boostraps samples and vary sample size from 10 to 100 in steps of 10. Coverage is defined as the proportion of times confidence intervals contain the population value.
+We sample from a lognormal distribution. For simplicity, we consider
+only two cases, in which we keep the sample size constant (n=30) and
+vary the number of bootstrap samples `nboot` from 500 to 10000 in steps
+of 500, or we use 2000 boostraps samples and vary sample size from 10 to
+100 in steps of 10. Coverage is defined as the proportion of times
+confidence intervals contain the population value.
 
-Example of 50 experiments
-=========================
+# Example of 50 experiments
 
-For each experiment, we sample trials with replacement from a lognormal population and compute different quantities and their confidence intervals.
+For each experiment, we sample trials with replacement from a lognormal
+population and compute different quantities and their confidence
+intervals.
 
-Simulation
-----------
+## Simulation
 
 ``` r
 n <- 30 # sample size
@@ -119,8 +127,7 @@ for(iter in 1:nsim){
 save(ci.m, ci.tm, ci.md, ci.hd, file = "./data/coverage50.RData")
 ```
 
-Figure
-------
+## Figure
 
 ``` r
 load(file = "./data/coverage50.RData")
@@ -165,18 +172,17 @@ p.50ci <- p
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-Save figure
------------
+## Save figure
 
 ``` r
 # save figure
 ggsave(filename=('./figures/figure_onesamp_50ci.pdf'),width=7,height=8)
+ggsave(filename=('./figures/figure5.pdf'),width=7,height=8)
 ```
 
-Define population values
-========================
+# Define population values
 
 ``` r
 pop <- rlnorm(10000000)
@@ -187,10 +193,12 @@ pop.tm <- mean(pop, trim = 0.2)
 rm(pop)
 ```
 
-Coverage simulation: vary bootstrap samples, n = 30
-===================================================
+# Coverage simulation: vary bootstrap samples, n = 30
 
-We vary the number of bootstrap samples used to compute the confidence intervals. Sample size is constant. We measure coverage and CI width. The width is defined as the value of the upper bound minus the value of the lower bound.
+We vary the number of bootstrap samples used to compute the confidence
+intervals. Sample size is constant. We measure coverage and CI width.
+The width is defined as the value of the upper bound minus the value of
+the lower bound.
 
 ``` r
 set.seed(21)
@@ -266,8 +274,7 @@ save(nsim, n, nboot.seq, alpha, probs,
 beep(8)
 ```
 
-Illustrate results: coverage
-----------------------------
+## Illustrate results: coverage
 
 We compute coverage as the mean across simulations.
 
@@ -286,30 +293,50 @@ lab <- c("500", " ",  "1500", " ", "2500", " ", "3500", " ", "4500", " ",
 df$est <- as.character(df$est)
 df$est <- factor(df$est, levels=unique(df$est))
 
-p <- ggplot(df, aes(x = nboot, y = res, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x = nboot, y = res, colour = est, linetype = est)) + theme_gar +
       geom_hline(yintercept = 0.95) +
       geom_line(size = 1) +
       scale_colour_manual(values = cc4) +
+      scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
       coord_cartesian(ylim = c(0.80, 1)) +
       scale_x_continuous(breaks = nboot.seq,
                          labels = lab) +
       labs(x = "Number of bootstrap samples", 
-           y = "Coverage") +
+           y = "Coverage",
+           colour = "Estimator",
+           linetype = "Estimator") +
       theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), # make thicker legend lines
-        title="Estimator")) + # change legend title
-  ggtitle("n = 30")
+            panel.grid.minor.x = element_blank(),
+            legend.key.width = unit(5,"cm")) +
+      guides(colour = guide_legend(override.aes = list(size=3), nrow=2), # make thicker legend lines
+             title="Estimator") + # change legend title 
+      ggtitle("n = 30")
 pcov.n30 <- p
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-Illustrate results: width
--------------------------
+Average coverage across bootstrap samples:  
+Mean = 88.4%  
+20% trimmed mean = 94.8%  
+Median = 94.6%  
+Harrell-Davis = 94.9%
 
-We summarise the width across simulations as the median width. Using the mean shows even bigger gaps between the mean and the 3 other estimators. However, because the intervals are for different quantities, the comparison in absolute width is difficult. As an alternative, in the next section we consider normalised width, defined as: (*C**I*<sub>*u**p**p**e**r*</sub> − *C**I*<sub>*l**o**w**e**r*</sub>)(*C**I*<sub>*u**p**p**e**r*</sub> + *C**I*<sub>*l**o**w**e**r*</sub>). The comparison of CI widths is more straightforward when the same measure of central tendency is involved in all comparisons, as done in notebook `ptb.Rmd`, where CI are computed for the mean or trimmed mean using 4 different techniques.
+## Illustrate results: width
+
+We summarise the width across simulations as the median width. Using the
+mean shows even bigger gaps between the mean and the 3 other estimators.
+However, because the intervals are for different quantities, the
+comparison in absolute width is difficult. As an alternative, in the
+next section we consider normalised width, defined as:
+
+![(CI\_{upper}-CI\_{lower})(CI\_{upper}+CI\_{lower})](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%28CI_%7Bupper%7D-CI_%7Blower%7D%29%28CI_%7Bupper%7D%2BCI_%7Blower%7D%29 "(CI_{upper}-CI_{lower})(CI_{upper}+CI_{lower})").
+
+The comparison of CI widths is more straightforward when the same
+measure of central tendency is involved in all comparisons, as done in
+notebook `ptb.Rmd`, where CI are computed for the mean or trimmed mean
+using 4 different techniques.
 
 ``` r
 # load(file = "./data/onesamp_coverage.RData")
@@ -323,25 +350,28 @@ df <- tibble(res = c(apply(wid.m, 2, median),
 df$est <- as.character(df$est)
 df$est <- factor(df$est, levels=unique(df$est))
 
-p <- ggplot(df, aes(x = nboot, y = res, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x = nboot, y = res, colour = est, linetype = est)) + theme_gar +
       geom_line(size = 1) +
       scale_colour_manual(values = cc4) +
+      scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
       coord_cartesian(ylim = c(0.85, 1.25)) +
       scale_x_continuous(breaks = nboot.seq,
                          labels = lab) +
       labs(x = "Number of bootstrap samples", 
-           y = "CI median width") +
+           y = "CI median width",
+           colour = "Estimator",
+           linetype = "Estimator") +
       theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), # make thicker legend lines
-        title="Estimator")) # change legend title
+            panel.grid.minor.x = element_blank(),
+            legend.key.width = unit(5,"cm")) +
+      guides(colour = guide_legend(override.aes = list(size=3), nrow=2), # make thicker legend lines
+             title="Estimator") # change legend title 
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-Illustrate results: normalised width
-------------------------------------
+## Illustrate results: normalised width
 
 ``` r
 # load(file = "./data/onesamp_coverage.RData")
@@ -355,25 +385,28 @@ df <- tibble(res = c(apply(nwid.m, 2, mean),
 df$est <- as.character(df$est)
 df$est <- factor(df$est, levels=unique(df$est))
 
-p <- ggplot(df, aes(x = nboot, y = res, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x = nboot, y = res, colour = est, linetype = est)) + theme_gar +
       geom_line(size = 1) +
       scale_colour_manual(values = cc4) +
       # coord_cartesian(ylim = c(0.85, 1.25)) +
+      scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
       scale_x_continuous(breaks = nboot.seq,
                          labels = lab) +
       labs(x = "Number of bootstrap samples", 
-           y = "CI normalised width") +
+           y = "CI normalised width",
+           colour = "Estimator",
+           linetype = "Estimator") +
       theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), # make thicker legend lines
-        title="Estimator")) # change legend title
+            panel.grid.minor.x = element_blank(),
+            legend.key.width = unit(5,"cm")) +
+  guides(colour = guide_legend(override.aes = list(size=3), nrow=2), # make thicker legend lines
+        title="Estimator") # change legend title
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-Coverage simulation: vary bootstrap samples, n = 10
-===================================================
+# Coverage simulation: vary bootstrap samples, n = 10
 
 ``` r
 set.seed(21)
@@ -450,8 +483,7 @@ save(nsim, n, nboot.seq, alpha, probs,
 beep(8)
 ```
 
-Illustrate results: coverage
-----------------------------
+## Illustrate results: coverage
 
 We compute coverage as the mean across simulations.
 
@@ -470,30 +502,41 @@ lab <- c("500", " ",  "1500", " ", "2500", " ", "3500", " ", "4500", " ",
 df$est <- as.character(df$est)
 df$est <- factor(df$est, levels=unique(df$est))
 
-p <- ggplot(df, aes(x = nboot, y = res, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x = nboot, y = res, colour = est, linetype = est)) + theme_gar +
       geom_hline(yintercept = 0.95) +
       geom_line(size = 1) +
       scale_colour_manual(values = cc4) +
+      scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
       coord_cartesian(ylim = c(0.80, 1)) +
       scale_x_continuous(breaks = nboot.seq,
                          labels = lab) +
       labs(x = "Number of bootstrap samples", 
-           y = "Coverage") +
+           y = "Coverage",
+           colour = "Estimator",
+           linetype = "Estimator") +
       theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), # make thicker legend lines
-        title="Estimator")) + # change legend title
+            panel.grid.minor.x = element_blank(),
+            legend.key.width = unit(5,"cm")) +
+  guides(colour = guide_legend(override.aes = list(size=3), nrow=2), # make thicker legend lines
+        title="Estimator") + # change legend title
     ggtitle("n = 10")
 pcov.n10 <- p
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
-Coverage simulation: vary sample size, nboot = 2000
-===================================================
+Average coverage across bootstrap samples:  
+Mean = 81.2%  
+20% trimmed mean = 93.6%  
+Median = 93.8%  
+Harrell-Davis = 92.2%
 
-We vary sample size from 10 to 100, in steps of 10. The number of bootstrap samples used to compute the confidence intervals is constant (`nboot` = 2,000).
+# Coverage simulation: vary sample size, nboot = 2000
+
+We vary sample size from 10 to 100, in steps of 10. The number of
+bootstrap samples used to compute the confidence intervals is constant
+(`nboot` = 2,000).
 
 ``` r
 set.seed(21)
@@ -574,8 +617,7 @@ save(nsim, n.seq, nboot, alpha, probs,
 beep(8)
 ```
 
-Illustrate results: coverage
-----------------------------
+## Illustrate results: coverage
 
 We compute coverage as the mean across simulations.
 
@@ -591,29 +633,33 @@ df <- tibble(res = c(apply(cov.m, 2, mean),
 df$est <- as.character(df$est)
 df$est <- factor(df$est, levels=unique(df$est))
 
-p <- ggplot(df, aes(x = nboot, y = res, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x = nboot, y = res, colour = est, linetype = est)) + theme_gar +
       geom_hline(yintercept = 0.95) +
       geom_line(size = 1) +
       scale_colour_manual(values = cc4) +
+      scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
       coord_cartesian(ylim = c(0.80, 1)) +
       scale_x_continuous(breaks = n.seq) +
       labs(x = "Sample size", 
-           y = "Coverage") +
+           y = "Coverage",
+           colour = "Estimator",
+           linetype = "Estimator") +
       theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), # make thicker legend lines
-        title="Estimator")) +  # change legend title
-    ggtitle("nboot = 2000")
+            panel.grid.minor.x = element_blank(),
+            legend.key.width = unit(5,"cm")) +
+      guides(colour = guide_legend(override.aes = list(size=3), nrow=2), # make thicker legend lines
+        title="Estimator") +  # change legend title
+      ggtitle("nboot = 2000")
 p.nboot2000 <- p
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
-Illustrate results: width
--------------------------
+## Illustrate results: width
 
-We summarise the width across simulations as the median width. Using the mean shows even bigger gaps between the mean and the 3 other estimators.
+We summarise the width across simulations as the median width. Using the
+mean shows even bigger gaps between the mean and the 3 other estimators.
 
 ``` r
 # load(file = "./data/onesamp_coverage.RData")
@@ -627,25 +673,28 @@ df <- tibble(res = c(apply(wid.m, 2, median),
 df$est <- as.character(df$est)
 df$est <- factor(df$est, levels=unique(df$est))
 
-p <- ggplot(df, aes(x = nboot, y = res, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x = nboot, y = res, colour = est, linetype = est)) + theme_gar +
       geom_line(size = 1) +
       scale_colour_manual(values = cc4) +
+      scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
       # coord_cartesian(ylim = c(0.85, 1.25)) +
       scale_x_continuous(breaks = n.seq) +
       labs(x = "Sample size", 
-           y = "CI median width") +
+           y = "CI median width",
+           colour = "Estimator",
+           linetype = "Estimator") +
       theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), # make thicker legend lines
-        title="Estimator")) # change legend title
+            panel.grid.minor.x = element_blank(),
+            legend.key.width = unit(5,"cm")) +
+  guides(colour = guide_legend(override.aes = list(size=3), nrow=2), # make thicker legend lines
+        title="Estimator") # change legend title
 # pB <- p
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
-Illustrate results: normalised width
-------------------------------------
+## Illustrate results: normalised width
 
 We summarise the width across simulations as the median width.
 
@@ -661,28 +710,33 @@ df <- tibble(res = c(apply(nwid.m, 2, mean),
 df$est <- as.character(df$est)
 df$est <- factor(df$est, levels=unique(df$est))
 
-p <- ggplot(df, aes(x = nboot, y = res, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x = nboot, y = res, colour = est, linetype = est)) + theme_gar +
       geom_line(size = 1) +
       scale_colour_manual(values = cc4) +
+      scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
       # coord_cartesian(ylim = c(0.85, 1.25)) +
       scale_x_continuous(breaks = nboot.seq,
                          labels = lab) +
       labs(x = "Sample size", 
-           y = "CI normalised width") +
+           y = "CI normalised width",
+           colour = "Estimator",
+           linetype = "Estimator") +
       theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), # make thicker legend lines
-        title="Estimator")) # change legend title
+            panel.grid.minor.x = element_blank(),
+            legend.key.width = unit(5,"cm")) +
+  guides(colour = guide_legend(override.aes = list(size=3), nrow=2), # make thicker legend lines
+        title="Estimator") # change legend title
 # pB <- p
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
-Coverage simulation: vary sample size, nboot = 200
-==================================================
+# Coverage simulation: vary sample size, nboot = 200
 
-We vary sample size from 10 to 100, in steps of 10. The number of bootstrap samples used to compute the confidence intervals is constant (`nboot` = 200).
+We vary sample size from 10 to 100, in steps of 10. The number of
+bootstrap samples used to compute the confidence intervals is constant
+(`nboot` = 200).
 
 ``` r
 set.seed(21)
@@ -763,8 +817,7 @@ save(nsim, n.seq, nboot, alpha, probs,
 beep(8)
 ```
 
-Illustrate results: coverage
-----------------------------
+## Illustrate results: coverage
 
 We compute coverage as the mean across simulations.
 
@@ -780,27 +833,30 @@ df <- tibble(res = c(apply(cov.m, 2, mean),
 df$est <- as.character(df$est)
 df$est <- factor(df$est, levels=unique(df$est))
 
-p <- ggplot(df, aes(x = nboot, y = res, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x = nboot, y = res, colour = est, linetype = est)) + theme_gar +
       geom_hline(yintercept = 0.95) +
       geom_line(size = 1) +
       scale_colour_manual(values = cc4) +
+      scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
       coord_cartesian(ylim = c(0.80, 1)) +
       scale_x_continuous(breaks = n.seq) +
       labs(x = "Sample size", 
-           y = "Coverage") +
+           y = "Coverage",
+           colour = "Estimator",
+           linetype = "Estimator") +
       theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), # make thicker legend lines
-        title="Estimator")) + # change legend title
+            panel.grid.minor.x = element_blank(),
+            legend.key.width = unit(5,"cm")) +
+  guides(colour = guide_legend(override.aes = list(size=3), nrow=2), # make thicker legend lines
+        title="Estimator") + # change legend title
   ggtitle("nboot = 200")
 p.nboot200 <- p
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-18-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
-Summary figure
-==============
+# Summary figure
 
 ``` r
 legend <- cowplot::get_legend(pcov.n10 + theme(legend.position = "bottom"))
@@ -828,15 +884,14 @@ cowplot::plot_grid(p.main,
 
 # save figure
 ggsave(filename=('./figures/figure_onesamp_coverage.pdf'),width=15,height=10)
+ggsave(filename=('./figures/figure7.pdf'),width=15,height=10)
 ```
 
-Stability
-=========
+# Stability
 
 We look at the variability of confidence intervals for the same sample.
 
-One sample
-----------
+## One sample
 
 ``` r
 set.seed(21)
@@ -865,29 +920,32 @@ p <- ggplot(data = df, aes(x = val, y = y)) + theme_gar +
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         panel.grid.minor.x = element_blank(),
-        legend.position = "bottom") +
+        legend.position = "bottom",
+        legend.key.width = unit(5,"cm")) +
   scale_x_continuous(breaks = seq(0, 10, 1)) +
   scale_y_continuous(breaks = 1) +
   # estimates
   geom_segment(data = df.est, aes(y = y, yend = yend,
-                   x = x, xend = xend, colour = est),
+                   x = x, xend = xend, colour = est, linetype = est),
                    size = 1, lineend = 'round') +
   scale_colour_manual(values = cc4) +
-  labs(x = "Values") + 
-   guides(colour = guide_legend(override.aes = list(size=3), 
-        title="Estimator")) #+
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
+  labs(x = "Values",
+       colour = "Estimator",
+       linetype = "Estimator") + 
+   guides(colour = guide_legend(override.aes = list(size=3), nrow=2), 
+        title="Estimator") #+
   # ggtitle("Random sample")
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
 pA <- p
 ```
 
-One bootstrap confidence interval
----------------------------------
+## One bootstrap confidence interval
 
 ``` r
 nboot <- 5000
@@ -931,7 +989,9 @@ p <- ggplot(df, aes(x = x, group = est, colour = est)) + theme_gar +
   # density
   geom_line(stat = "density", size = 1) +
   scale_colour_manual(values = cc4) +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   # sample estimates: vertical line + label
   geom_vline(data = df.est, aes(xintercept = x, group = est)) +
   # confidence interval ----------------------
@@ -944,16 +1004,16 @@ p <- ggplot(df, aes(x = x, group = est, colour = est)) + theme_gar +
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-21-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 pB <- p
 ```
 
-Twenty bootstrap confidence intervals
--------------------------------------
+## Twenty bootstrap confidence intervals
 
-We compute confidence intervals several times for the same sample, to look at the bootstrap sampling variability.
+We compute confidence intervals several times for the same sample, to
+look at the bootstrap sampling variability.
 
 ``` r
 set.seed(21)
@@ -1004,19 +1064,18 @@ p <- ggplot(df, aes(x=x, xend=xend, y=y, yend=yend, group = est, colour = est)) 
   # sample estimates: vertical line + label
   geom_vline(data = df.est, aes(xintercept = x, group = est)) +
   labs(x = "Bootstrap estimates",
-       y = "Density") +
+       y = "Confidence intervals") +
   facet_wrap(vars(est), ncol = 2)
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-22-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ``` r
 pC <- p
 ```
 
-Simulation
-----------
+## Simulation
 
 ``` r
 set.seed(21)
@@ -1058,8 +1117,7 @@ save(nboot.seq, nrep,
 beep(8)
 ```
 
-Illustrate results
-------------------
+## Illustrate results
 
 ``` r
 load(file = "./data/onesamp_stability.RData")
@@ -1077,32 +1135,34 @@ df <- tibble(val = c(sd.m[,1], sd.tm[,1], sd.md[,1], sd.hd[,1],
                                      each = length(nboot.seq)),2))
                 )
 
-df$est <- as.character(df$est)
-df$est <- factor(df$est, levels=unique(df$est))
+df$ci <- keeporder(df$ci)
   
-p <- ggplot(df, aes(x=nboot, y=val, group = est, colour = est)) + theme_gar +
+p <- ggplot(df, aes(x=nboot, y=val, group = est, colour = est, linetype = est)) + theme_gar +
   geom_line(size = 1) +
   scale_colour_manual(values = cc4) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "solid")) +
   theme(legend.position = "bottom",
-            panel.grid.minor.x = element_blank()) +
-  guides(colour = guide_legend(override.aes = list(size=3), 
-        title="Estimator")) +
+        panel.grid.minor.x = element_blank(),
+        legend.key.width = unit(5,"cm")) +
+  guides(colour = guide_legend(override.aes = list(size=3), nrow=2), 
+        title="Estimator") +
   labs(x = "Number of bootstrap samples",
-       y = "Variability in SD units") +
+       y = "Variability in SD units",
+       colour = "Estimator",
+       linetype = "Estimator") +
   scale_x_continuous(breaks = nboot.seq,
                          labels = lab) +
   facet_grid(cols = vars(ci))
 p
 ```
 
-![](coverage_files/figure-markdown_github/unnamed-chunk-24-1.png)
+![](coverage_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
 pD <- p
 ```
 
-Summary figure
---------------
+## Summary figure
 
 ``` r
 pAB <- cowplot::plot_grid(pA, pB,
@@ -1114,19 +1174,19 @@ pAB <- cowplot::plot_grid(pA, pB,
                     axis = "l",
                     label_size = 20, 
                     hjust = 0, 
-                    scale=.95)
+                    scale = .95)
 
 pTOP <- cowplot::plot_grid(pAB, pC,
                     labels = c(NA, "C"),
                     ncol = 2,
                     nrow = 1,
                     rel_widths =  c(1, 1), 
-                    align = "h",
+                    align = "v",
                     # axis = "b",
                     label_size = 20, 
                     hjust = -0.5, 
                     vjust = 2.8,
-                    scale=.95)
+                    scale = .95)
 
 cowplot::plot_grid(pTOP, pD,
                     labels = c(NA, "D"),
@@ -1137,8 +1197,9 @@ cowplot::plot_grid(pTOP, pD,
                     # axis = "l",
                     label_size = 20, 
                     hjust = -2, 
-                    scale=.95)
+                    scale = .95)
 
 # save figure
 ggsave(filename=('./figures/figure_onesamp_stability.pdf'),width=15,height=17)
+ggsave(filename=('./figures/figure8.pdf'),width=15,height=17)
 ```

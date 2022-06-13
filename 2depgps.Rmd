@@ -3,15 +3,15 @@ title: "Compare two dependent groups using hierarchical bootstrap sampling"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
-    github_document:
-    html_preview: yes
+  pdf_document:
+    fig_caption: no
+    number_sections: no
     toc: yes
     toc_depth: 2
+    # github_document:
+    # html_preview: yes
+    # toc: yes
+    # toc_depth: 2
 ---
 
 # Dependencies
@@ -20,7 +20,7 @@ library(tibble)
 library(ggplot2)
 source("./functions/theme_gar.txt")
 source("./functions/functions.txt")
-# source("./functions/Rallfun-v35.txt")
+# source("./functions/Rallfun-v40.txt")
 library(beepr)
 # install.packages("devtools")
 # devtools::install_github("GRousselet/rogme")
@@ -43,7 +43,7 @@ bootdpci(x,y,est=median)
 comdvar(x,y,alpha=0.05)
 
 # To use these functions:
-# source("./functions/Rallfun-v35.txt")
+# source("./functions/Rallfun-v40.txt")
 ```
 
 For two dependent groups, an effective approach is to make inferences about the one-sample distribution of the pairwise differences. This case was already covered in the `pb` notebook. Instead, here we consider a hierarchical situation, in which each participant was tested in 2 conditions, with a large number of trials per condition. In this situation, we can build confidence intervals for each participant and at the group level. For each participant, we use the approach for 2 independent groups described in the `2indgps` notebook. At the group level, we apply a hierarchical bootstrap: following the data sampling, first we sample participants with replacement, second for each bootstrap participant, we sample trials with replacements. 
@@ -68,7 +68,7 @@ N = `r length(unique(flp$participant))` participants.
 
 ## Create data frame
 ```{r}
-set.seed(7777)
+set.seed(666)
 p.list <- as.numeric(as.character(unique(flp$participant)))
 np <- 20
 nt <- 200
@@ -96,12 +96,16 @@ df$condition <- factor(df$condition, levels=unique(df$condition))
 
 p <- ggplot(df, aes(x = rt)) + theme_gar +
   geom_line(stat = "density", aes(colour=participant), size = 0.5) + 
-  scale_color_viridis_d() + 
-  scale_x_continuous(breaks=seq(0,2000,250), minor_breaks = waiver()) +
-  # coord_cartesian(xlim = c(0, 2000)) +
+  scale_color_viridis_d(begin = 0.1) + 
+  scale_x_continuous(breaks=seq(0,2000,250), 
+                     minor_breaks = waiver(),
+                     expand = c(0, 0)) +
+  coord_cartesian(xlim = c(0, 2000)) +
   theme(plot.title = element_text(size=22),
         axis.title.x = element_text(size = 18),
         axis.text = element_text(size = 16, colour = "black"),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
         axis.title.y = element_text(size = 18),
         legend.text = element_text(size = 16),
         legend.title = element_text(size = 18),
@@ -224,7 +228,7 @@ p.scat.md <- p
 p
 ```
 
-# Hierarchical bootstrap
+# Hierarchical bootstrap: 20% trimmed means
 
 We perform the standard bootstrap and the hierarchical version on the same data for comparison. 
 ```{r}
@@ -257,9 +261,9 @@ for(B in 1:nboot){
 }
 ```
 
-# Illustrate results
+## Illustrate results
 We illustrate the group confidence intervals for each condition and for the pairwise differences. 
-```{r, fig.height = 4, fig.width = 10}
+```{r, fig.height = 4, fig.width = 10, warning=FALSE}
 # compute confidence intervals --------------------------
 alpha <- 0.05
 probs <- c(alpha/2, 1-alpha/2)
@@ -293,8 +297,8 @@ df.ci <- tibble(x = c(ci.hierar[1,]),
                 yend = rep(0, 3),
                 cond = factor(c("Word", "Non-Word", "Difference")))
   
-scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1000)),
-                 `Non-Word` = scale_x_continuous(limits = c(600, 1000)),
+scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1100)),
+                 `Non-Word` = scale_x_continuous(limits = c(600, 1100)),
                  `Difference` = scale_x_continuous(limits = c(0, 200)))
 
 # make figure --------------------------
@@ -309,13 +313,15 @@ p <- ggplot(df, aes(x = x)) + theme_gar +
                lineend = "round", size = 2, colour = "black") +
   labs(x = "Bootstrap group trimmed means (ms)",
        y = "Density") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   facet_grid_sc(cols = vars(cond), scales = list(x = scales_x))
 p.boot <- p
 p
 ```
-
+## Illustrate results (new version)
 New version with the hierarchical and non-hierarchical confidence intervals superimposed.
-```{r, fig.height = 4, fig.width = 10}
+```{r, fig.height = 4, fig.width = 10, warning=FALSE}
 # compute confidence intervals --------------------------
 alpha <- 0.05
 probs <- c(alpha/2, 1-alpha/2)
@@ -355,15 +361,17 @@ df.ci <- tibble(x = c(ci.hierar[1,], ci.level1[1,]),
                 type = factor(rep(c("Hierarchical","Non-hierarchical"), each = 3))
                 )
   
-scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1000)),
-                 `Non-Word` = scale_x_continuous(limits = c(600, 1000)),
+scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1100)),
+                 `Non-Word` = scale_x_continuous(limits = c(600, 1100)),
                  `Difference` = scale_x_continuous(limits = c(0, 200)))
 
 # make figure --------------------------
 p <- ggplot(df, aes(x = x, colour = type)) + theme_gar +
   # density
   geom_line(stat = "density", size = 1) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom",
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   # sample trimmed means: vertical line + label
   geom_vline(data = df.tm, aes(xintercept = tm)) +
   # confidence interval ----------------------
@@ -457,15 +465,17 @@ df.ci <- tibble(x = c(ci.hierar[1,], ci.level1[1,]),
                 type = factor(rep(c("Hierarchical","Non-hierarchical"), each = 3))
                 )
   
-scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1000)),
-                 `Non-Word` = scale_x_continuous(limits = c(600, 1000)),
+scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1100)),
+                 `Non-Word` = scale_x_continuous(limits = c(600, 1100)),
                  `Difference` = scale_x_continuous(limits = c(0, 200)))
 
 # make figure --------------------------
 p <- ggplot(df, aes(x = x, colour = type)) + theme_gar +
   # density
   geom_line(stat = "density", size = 1) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom",
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   # sample trimmed means: vertical line + label
   geom_vline(data = df.tm, aes(xintercept = tm)) +
   # confidence interval ----------------------
@@ -482,7 +492,7 @@ p.boot.md <- p
 p
 ```
 
-That's the case: the distributions of the bootstrap medians are very irregular. Bootstrapping at two levels (trials and participants) leads to much smoother distributions and very different confidence intervals.
+The distributions of the bootstrap medians are very irregular. Bootstrapping at two levels (trials and participants) leads to much smoother distributions and different confidence intervals.
 
 # Summary figure
 ```{r, eval = FALSE}
@@ -506,5 +516,6 @@ cowplot::plot_grid(p.20,
 
 # save figure
 ggsave(filename=('./figures/figure_hpb.pdf'),width=13,height=15)
+ggsave(filename=('./figures/figure12.pdf'),width=13,height=15)
 ```
 

@@ -3,15 +3,15 @@ title: "Bootstrap sampling distributions"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
-    github_document:
-    html_preview: yes
+  pdf_document:
+    fig_caption: no
+    number_sections: no
     toc: yes
     toc_depth: 2
+    # github_document:
+    # html_preview: yes
+    # toc: yes
+    # toc_depth: 2
 ---
 
 # Dependencies
@@ -20,7 +20,7 @@ library(tibble)
 library(ggplot2)
 # library(cowplot)
 source("./functions/theme_gar.txt")
-# source("./functions/Rallfun-v35.txt")
+# source("./functions/Rallfun-v40.txt")
 ```
 
 ```{r}
@@ -35,24 +35,36 @@ We sample from a lognormal distribution, because, you know, life is [lognormal](
 For comparison, show normal distribution with the same mean and sd as the default lognormal (meanlog = 0, sdlog = 1). The [mean of the lognormal distribution](https://en.wikipedia.org/wiki/Log-normal_distribution) with meanlog = 0 and sdlog = 1 is `exp(meanlog + sdlog^2/2)` = exp(1/2).
 The variance is `(exp(sdlog^2)-1) * exp(2*meanlog + sdlog^2)` = (exp(1)-1) * exp(1).
 
-Check that the two distributions have the same mean and sd.
+### Check that the two distributions have the same mean and variance.
 ```{r}
 set.seed(777)
 pop1 <- rnorm(1000000, 
              mean = exp(1/2), 
              sd = sqrt((exp(1)-1) * exp(1))
              )
-mean(pop1)
-var(pop1)
+#mean(pop1)
+#var(pop1)
 
 pop2 <- rlnorm(1000000, meanlog = 0, sdlog = 1)
-mean(pop2)
-var(pop2)
+#mean(pop2)
+#var(pop2)
 
-pop.tm <- mean(pop2, trim = 0.2)
+pop.tm <- mean(pop2, trim = 0.2) # save population trimmed mean for figure
 ```
+Normal population:
 
-Make figure
+- Mean = `r round(mean(pop1), digits=2)`
+
+- Variance = `r round(var(pop1), digits=2)`
+
+Lognormal population:
+
+- Mean = `r round(mean(pop2), digits=2)`
+
+- Variance = `r round(var(pop2), digits=2)`
+
+
+### Make figure
 ```{r, fig.height=4}
 x.n <- seq(-5, 7, 0.001)
 x.ln <- seq(0, 7, 0.001)
@@ -70,19 +82,22 @@ p <- ggplot(df, aes(x = x, y = y, colour = dist)) + theme_gar +
   labs(x = "Values", y = "Density") +
   scale_colour_manual(name = "", values = c("Lognormal" = "orange",
                                             "Normal" = "purple")) +
-  theme(legend.position = "bottom")
+  theme(legend.position = c(0.15, 0.86),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
 p
 ```
 
-Save figure
+### Save figure
 ```{r, eval = FALSE}
 # save figure
 ggsave(filename=('./figures/figure_lognormal_pop.pdf'),width=7,height=5)
+ggsave(filename=('./figures/figure3.pdf'),width=7,height=5)
 ```
 
 ## Illustrate sampling distributions
 We draw 50,000 samples for different sizes from our population.
-Each of these samples is like an experiment. For each experiment, we compute a statistics of interest, here the 20% trimmed mean.
+Each of these samples is like an experiment. For each experiment, we compute a statistics of interest, here the 20% trimmed mean. In each plot, the vertical dashed line marks the population 20% trimmed mean that we are trying to estimate.
 
 ### n = 20
 ```{r, fig.height=3}
@@ -96,7 +111,9 @@ v <- enframe(dist.samp, name = NULL)
 p <- ggplot(v, aes(x = value)) + theme_gar +
         geom_vline(xintercept = pop.tm, linetype = 'longdash', colour = "black") +
         geom_line(stat = 'density', size = 1) +  
-  theme(plot.margin = unit(c(0, 0, 0.5, 0), "cm")) +
+  theme(plot.margin = unit(c(0, 0, 0.5, 0), "cm"),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   labs(x = "Sample trimmed means", y = "Density") +
   ggtitle("Sampling distribution: n = 20") +
   coord_cartesian(xlim = c(0, 4))
@@ -116,7 +133,9 @@ v <- enframe(dist.samp, name = NULL)
 p <- ggplot(v, aes(x = value)) + theme_gar +
         geom_vline(xintercept = pop.tm, linetype = 'longdash', colour = "black") +
         geom_line(stat = 'density', size = 1) +
-  theme(plot.margin = unit(c(0, 0, 0.5, 0), "cm")) +
+  theme(plot.margin = unit(c(0, 0, 0.5, 0), "cm"),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
    labs(x = "Sample trimmed means", y = "Density") +
   coord_cartesian(xlim = c(0, 4)) +   
   ggtitle("Sampling distribution: n = 30")
@@ -136,7 +155,9 @@ v <- enframe(dist.samp, name = NULL)
 p <- ggplot(v, aes(x = value)) + theme_gar +
         geom_vline(xintercept = pop.tm, linetype = 'longdash', colour = "black") +
         geom_line(stat = 'density', size = 1) +
-  theme(plot.margin = unit(c(0, 0, 0.5, 0), "cm")) +
+  theme(plot.margin = unit(c(0, 0, 0.5, 0), "cm"),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
    labs(x = "Sample trimmed means", y = "Density") +
   coord_cartesian(xlim = c(0, 4)) +  
   ggtitle("Sampling distribution: n = 50")
@@ -145,6 +166,8 @@ p
 ```
 
 ## Illustrate 4 samples
+
+In each plot, the vertical dashed line marks the population 20% trimmed mean, whereas the vertical continuous line marks the sample 20% trimmed mean.  
 
 ### Define function for horizontal jitter plot
 ```{r}
@@ -507,28 +530,36 @@ p
 
 # -------------------------------------------------
 p2.1 <- cowplot::plot_grid(p.samp20_1, p.boot20_1 + theme(axis.title = element_blank()),
-                    labels = c("1"),
+                    labels = c("1", "B"),
+                    label_size = 18,
+                    hjust = c(-0.5, 2.2),
+                    vjust = c(1.5, -4.3),
                     ncol = 1, nrow = 2,
                     rel_heights = c(1.5, 3))
 
 p2.2 <- cowplot::plot_grid(p.samp20_2, p.boot20_2 + theme(axis.title = element_blank()),
                     labels = c("2"),
+                    label_size = 18,
                     ncol = 1, nrow = 2,
                     rel_heights = c(1.5, 3))
 
 p2.3 <- cowplot::plot_grid(p.samp20_3, p.boot20_3 + theme(axis.title = element_blank()),
                     labels = c("3"),
+                    label_size = 18,
                     ncol = 1, nrow = 2,
                     rel_heights = c(1.5, 3))
 
 p2.4 <- cowplot::plot_grid(p.samp20_4, p.boot20_4,
                     labels = c("4"),
+                    label_size = 18,
                     ncol = 1, nrow = 2,
                     rel_heights = c(1.5, 3))
 
 p2 <- cowplot::plot_grid(p.sampdist1,
                          p2.1, p2.2, p2.3, p2.4,
-                    labels = c(""),
+                    labels = c("A"),
+                    hjust = 0.7,
+                    label_size = 18,
                     ncol = 1, 
                     nrow = 5,
                     align = "v",
@@ -607,4 +638,5 @@ cowplot::plot_grid(p2, p3, p4,
 
 # save figure
 ggsave(filename=('./figures/figure_sampdist_lognormal.pdf'),width=20,height=15)
+ggsave(filename=('./figures/figure4.pdf'),width=20,height=15)
 ```

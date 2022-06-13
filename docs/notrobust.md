@@ -1,23 +1,25 @@
 The bootstrap is not robust
 ================
 Guillaume A. Rousselet
-2019-05-25
+2022-06-13
 
-Dependencies
-============
+# Dependencies
 
 ``` r
 library(tibble)
 library(ggplot2)
 # library(cowplot)
-source("./functions/Rallfun-v35.txt")
+source("./functions/Rallfun-v40.txt")
 source("./functions/theme_gar.txt")
 ```
 
-The bootstrap is sometimes described as a robust technique. In itself, it is not robust. A simple example can illustrate this lack of robustness: percentile bootstrap confidence intervals for the mean are not robust.
+The bootstrap is sometimes described as a robust technique. In itself,
+it is not robust. A simple example can illustrate this lack of
+robustness: percentile bootstrap confidence intervals for the mean are
+not robust, because the mean is not a robust estimator of central
+tendency.
 
-Generate data and compute confidence intervals
-==============================================
+# Generate data and compute confidence intervals
 
 ``` r
 set.seed(21)
@@ -39,12 +41,11 @@ for(C in 1:7){
   ci_mean_t[,C] <- t.test(todo)$conf.int
   ci_mean_pb[,C] <- onesampb(todo, mean)$ci # default to nboot = 2000
   ci_median_pb[,C] <- onesampb(todo, median)$ci
-  ci_median_param[,C] <- sint(todo) # parametric method
+  ci_median_param[,C] <- sint(todo) # parametric method for the median
 }
 ```
 
-Illustrate results: mean + standard CI
-======================================
+# Illustrate results: mean + standard CI
 
 ``` r
 set.seed(777) # for reproducible jitter
@@ -72,14 +73,13 @@ geom_errorbar(data = df2, aes(x=cond, ymin=ci_low, ymax=ci_up),
 p
 ```
 
-![](notrobust_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](notrobust_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 pA <- p
 ```
 
-Illustrate results: mean + boot CI
-==================================
+# Illustrate results: mean + boot CI
 
 ``` r
 set.seed(777) # for reproducible jitter
@@ -107,14 +107,13 @@ geom_errorbar(data = df2, aes(x=cond, ymin=ci_low, ymax=ci_up),
 p
 ```
 
-![](notrobust_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](notrobust_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 pB <- p
 ```
 
-Illustrate results: median + boot CI
-====================================
+# Illustrate results: median + boot CI
 
 ``` r
 set.seed(777) # for reproducible jitter
@@ -142,14 +141,13 @@ geom_errorbar(data = df2, aes(x=cond, ymin=ci_low, ymax=ci_up),
 p
 ```
 
-![](notrobust_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](notrobust_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 pC <- p
 ```
 
-Illustrate results: median + parametric CI
-==========================================
+# Illustrate results: median + parametric CI
 
 ``` r
 set.seed(777) # for reproducible jitter
@@ -177,21 +175,20 @@ geom_errorbar(data = df2, aes(x=cond, ymin=ci_low, ymax=ci_up),
 p
 ```
 
-![](notrobust_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](notrobust_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 # pC <- p
 ```
 
-Summary figure
-==============
+# Summary figure
 
 ``` r
-cowplot::plot_grid(pA, pB,
+cowplot::plot_grid(pA, pB, pC,
                     labels = c("A", "B", "C"),
-                    ncol = 2,
+                    ncol = 3,
                     nrow = 1,
-                    rel_widths = c(1, 1), 
+                    rel_widths = c(1, 1, 1), 
                     label_size = 20, 
                     hjust = -0.5, 
                     scale=.95,
@@ -199,4 +196,5 @@ cowplot::plot_grid(pA, pB,
 
 # save figure
 ggsave(filename=('./figures/figure_notrobust.pdf'),width=10,height=5)
+ggsave(filename=('./figures/figure6.pdf'),width=10,height=5)
 ```

@@ -3,15 +3,15 @@ title: "Percentage correct example"
 author: "Guillaume A. Rousselet"
 date: "`r Sys.Date()`"
 output:
-  # pdf_document:
-  #   fig_caption: no
-  #   number_sections: no
-  #   toc: yes
-  #   toc_depth: 2
-    github_document:
-    html_preview: yes
+  pdf_document:
+    fig_caption: no
+    number_sections: no
     toc: yes
     toc_depth: 2
+    # github_document:
+    # html_preview: yes
+    # toc: yes
+    # toc_depth: 2
 ---
 
 # Dependencies
@@ -20,10 +20,10 @@ library(tibble)
 library(ggplot2)
 # library(cowplot)
 source("./functions/theme_gar.txt")
-source("./functions/Rallfun-v35.txt")
+source("./functions/Rallfun-v40.txt")
 ```
 
-After taking the mean across trials, correct/incorrect data are often wrongly assumed to be normaly distributed. Instead, these data are always positive and bounded, and are better modelled using a beta distribution (Kruschke, 2014). Similarly, standard methods are inappropriate for ordinal data, like Likert scale results, which are too often treated as metric (Bürkner & Vuorre, 2019; Liddell & Kruschke, 2018). 
+After taking the mean across trials, correct/incorrect data are often wrongly assumed to be normally distributed. Instead, these data are always positive and bounded, and are better modelled using a beta distribution (Kruschke, 2014). Similarly, standard methods are inappropriate for ordinal data, like Likert scale results, which are too often treated as metric (Bürkner & Vuorre, 2019; Liddell & Kruschke, 2018). 
 
 # Make data and compute confidence intervals
 ```{r}
@@ -72,6 +72,14 @@ p
 pA <- p
 ```
 
+Sample means:
+
+- Condition 1 = `r round(mean(norm_samp), digits=1)`
+
+- Condition 2 = `r round(mean(skew_samp), digits=1)`
+
+- Condition 3 = `r round(mean(skew_samp2), digits=1)`  
+
 # Illustration: bootstrap confidence interval
 ```{r}
 set.seed(21) # for reproducible jitter
@@ -114,6 +122,7 @@ cowplot::plot_grid(pA, pB,
 
 # save figure
 ggsave(filename=('./figures/figure_pc.pdf'),width=10,height=5)
+ggsave(filename=('./figures/figure2.pdf'),width=10,height=5)
 ```
 
 # References

@@ -1,17 +1,16 @@
 Compare two dependent groups using hierarchical bootstrap sampling
 ================
 Guillaume A. Rousselet
-2019-05-25
+2022-06-13
 
-Dependencies
-============
+# Dependencies
 
 ``` r
 library(tibble)
 library(ggplot2)
 source("./functions/theme_gar.txt")
 source("./functions/functions.txt")
-# source("./functions/Rallfun-v35.txt")
+# source("./functions/Rallfun-v40.txt")
 library(beepr)
 # install.packages("devtools")
 # devtools::install_github("GRousselet/rogme")
@@ -25,13 +24,13 @@ library(facetscales) # set different scales for each facet
 sessionInfo()
 ```
 
-    ## R version 3.5.2 (2018-12-20)
-    ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-    ## Running under: macOS Mojave 10.14.5
+    ## R version 4.2.0 (2022-04-22)
+    ## Platform: x86_64-apple-darwin17.0 (64-bit)
+    ## Running under: macOS Catalina 10.15.7
     ## 
     ## Matrix products: default
-    ## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
     ## 
     ## locale:
     ## [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
@@ -40,20 +39,22 @@ sessionInfo()
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] facetscales_0.1.0 rogme_0.2.1       beepr_1.3         ggplot2_3.1.1    
-    ## [5] tibble_2.1.1     
+    ## [1] facetscales_0.1.0.9000 rogme_0.2.1            beepr_1.3             
+    ## [4] ggplot2_3.3.6          tibble_3.1.7          
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_1.0.1       knitr_1.21       magrittr_1.5     tidyselect_0.2.5
-    ##  [5] munsell_0.5.0    colorspace_1.4-1 R6_2.4.0         rlang_0.3.4     
-    ##  [9] stringr_1.4.0    plyr_1.8.4       dplyr_0.8.0.1    tools_3.5.2     
-    ## [13] grid_3.5.2       gtable_0.3.0     xfun_0.4         audio_0.1-5.1   
-    ## [17] withr_2.1.2      htmltools_0.3.6  yaml_2.2.0       lazyeval_0.2.2  
-    ## [21] digest_0.6.18    assertthat_0.2.1 crayon_1.3.4     purrr_0.3.2     
-    ## [25] glue_1.3.1       evaluate_0.12    rmarkdown_1.11   stringi_1.4.3   
-    ## [29] compiler_3.5.2   pillar_1.3.1     scales_1.0.0     pkgconfig_2.0.2
+    ##  [1] pillar_1.7.0     compiler_4.2.0   tools_4.2.0      digest_0.6.29   
+    ##  [5] evaluate_0.15    lifecycle_1.0.1  gtable_0.3.0     pkgconfig_2.0.3 
+    ##  [9] rlang_1.0.2      cli_3.3.0        rstudioapi_0.13  yaml_2.3.5      
+    ## [13] xfun_0.31        fastmap_1.1.0    withr_2.5.0      stringr_1.4.0   
+    ## [17] dplyr_1.0.9      knitr_1.39       generics_0.1.2   vctrs_0.4.1     
+    ## [21] grid_4.2.0       tidyselect_1.1.2 glue_1.6.2       R6_2.5.1        
+    ## [25] fansi_1.0.3      rmarkdown_2.14   purrr_0.3.4      magrittr_2.0.3  
+    ## [29] scales_1.2.0     ellipsis_0.3.2   htmltools_0.5.2  colorspace_2.0-3
+    ## [33] utf8_1.2.2       stringi_1.7.6    munsell_0.5.0    crayon_1.5.1    
+    ## [37] audio_0.1-10
 
-Rand Wilcox's functions for two dependent groups
+Rand Wilcox’s functions for two dependent groups
 
 ``` r
 # percentile bootstrap using any estimator
@@ -63,12 +64,27 @@ bootdpci(x,y,est=median)
 comdvar(x,y,alpha=0.05)
 
 # To use these functions:
-# source("./functions/Rallfun-v35.txt")
+# source("./functions/Rallfun-v40.txt")
 ```
 
-For two dependent groups, an effective approach is to make inferences about the one-sample distribution of the pairwise differences. This case was already covered in the `pb` notebook. Instead, here we consider a hierarchical situation, in which each participant was tested in 2 conditions, with a large number of trials per condition. In this situation, we can build confidence intervals for each participant and at the group level. For each participant, we use the approach for 2 independent groups described in the `2indgps` notebook. At the group level, we apply a hierarchical bootstrap: following the data sampling, first we sample participants with replacement, second for each bootstrap participant, we sample trials with replacements.
+For two dependent groups, an effective approach is to make inferences
+about the one-sample distribution of the pairwise differences. This case
+was already covered in the `pb` notebook. Instead, here we consider a
+hierarchical situation, in which each participant was tested in 2
+conditions, with a large number of trials per condition. In this
+situation, we can build confidence intervals for each participant and at
+the group level. For each participant, we use the approach for 2
+independent groups described in the `2indgps` notebook. At the group
+level, we apply a hierarchical bootstrap: following the data sampling,
+first we sample participants with replacement, second for each bootstrap
+participant, we sample trials with replacements.
 
-We use data from the [French Lexicon Project](https://sites.google.com/site/frenchlexicon/results). Click on "French Lexicon Project trial-level results with R scripts.zip". The `.RData` dataset was created by applying the script `getflprtdata.Rmd` available on [GitHub](https://github.com/GRousselet/rogme/tree/master/data-raw).
+We use data from the [French Lexicon
+Project](https://sites.google.com/site/frenchlexicon/results). Click on
+“French Lexicon Project trial-level results with R scripts.zip”. The
+`.RData` dataset was created by applying the script `getflprtdata.Rmd`
+available on
+[GitHub](https://github.com/GRousselet/rogme/tree/master/data-raw).
 
 ``` r
 # get data - tibble = `flp`
@@ -82,14 +98,12 @@ flp <- rogme::flp
 
 N = 959 participants.
 
-Illustrate random sample of 20 participants \* 200 trials
-=========================================================
+# Illustrate random sample of 20 participants \* 200 trials
 
-Create data frame
------------------
+## Create data frame
 
 ``` r
-set.seed(7777)
+set.seed(666)
 p.list <- as.numeric(as.character(unique(flp$participant)))
 np <- 20
 nt <- 200
@@ -103,8 +117,7 @@ for(P in 1:np){
 }
 ```
 
-Make figure
------------
+## Make figure
 
 ``` r
 df <- tibble(rt = c(as.vector(resmat[1,,]),
@@ -118,12 +131,16 @@ df$condition <- factor(df$condition, levels=unique(df$condition))
 
 p <- ggplot(df, aes(x = rt)) + theme_gar +
   geom_line(stat = "density", aes(colour=participant), size = 0.5) + 
-  scale_color_viridis_d() + 
-  scale_x_continuous(breaks=seq(0,2000,250), minor_breaks = waiver()) +
-  # coord_cartesian(xlim = c(0, 2000)) +
+  scale_color_viridis_d(begin = 0.1) + 
+  scale_x_continuous(breaks=seq(0,2000,250), 
+                     minor_breaks = waiver(),
+                     expand = c(0, 0)) +
+  coord_cartesian(xlim = c(0, 2000)) +
   theme(plot.title = element_text(size=22),
         axis.title.x = element_text(size = 18),
         axis.text = element_text(size = 16, colour = "black"),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
         axis.title.y = element_text(size = 18),
         legend.text = element_text(size = 16),
         legend.title = element_text(size = 18),
@@ -136,29 +153,33 @@ p <- ggplot(df, aes(x = rt)) + theme_gar +
 p
 ```
 
-![](2depgps_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](2depgps_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 p.20 <- p
 ```
 
-Group 20% trimmed mean
-======================
+# Group 20% trimmed mean
 
-Because there is skewness at the two levels of analysis, we need to consider our estimators carefully at each level. Here for simplicity we compute the 20% trimmed mean for each participant and condition, take the difference between conditions, and finally compute the 20% trimmed mean of these differences. Many other options could be considered, some of which are covered in an other tutorial ([Rousselet & Wilcox, 2019](https://psyarxiv.com/3y54r/)).
+Because there is skewness at the two levels of analysis, we need to
+consider our estimators carefully at each level. Here for simplicity we
+compute the 20% trimmed mean for each participant and condition, take
+the difference between conditions, and finally compute the 20% trimmed
+mean of these differences. Many other options could be considered, some
+of which are covered in an other tutorial ([Rousselet & Wilcox,
+2019](https://psyarxiv.com/3y54r/)).
 
-Compute trimmed means
----------------------
+## Compute trimmed means
 
 ``` r
 # get data: mean RT for every participant
 tmres <- apply(resmat, c(1,3), mean, trim = 0.2)
 ```
 
-Illustrate distributions
-------------------------
+## Illustrate distributions
 
-20% trimmed means for the Word and Non-Word conditions and their differences.
+20% trimmed means for the Word and Non-Word conditions and their
+differences.
 
 ``` r
 set.seed(21) # reproducible jitter
@@ -203,21 +224,18 @@ p.scat <- p
 p
 ```
 
-![](2depgps_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](2depgps_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-Group median
-============
+# Group median
 
-Compute medians
----------------
+## Compute medians
 
 ``` r
 # get data: mean RT for every participant
 mdres <- apply(resmat, c(1,3), median)
 ```
 
-Illustrate distributions
-------------------------
+## Illustrate distributions
 
 20% medians for the Word and Non-Word conditions and their differences.
 
@@ -264,12 +282,12 @@ p.scat.md <- p
 p
 ```
 
-![](2depgps_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](2depgps_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-Hierarchical bootstrap
-======================
+# Hierarchical bootstrap: 20% trimmed means
 
-We perform the standard bootstrap and the hierarchical version on the same data for comparison.
+We perform the standard bootstrap and the hierarchical version on the
+same data for comparison.
 
 ``` r
 set.seed(21)
@@ -301,10 +319,10 @@ for(B in 1:nboot){
 }
 ```
 
-Illustrate results
-==================
+## Illustrate results
 
-We illustrate the group confidence intervals for each condition and for the pairwise differences.
+We illustrate the group confidence intervals for each condition and for
+the pairwise differences.
 
 ``` r
 # compute confidence intervals --------------------------
@@ -340,8 +358,8 @@ df.ci <- tibble(x = c(ci.hierar[1,]),
                 yend = rep(0, 3),
                 cond = factor(c("Word", "Non-Word", "Difference")))
   
-scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1000)),
-                 `Non-Word` = scale_x_continuous(limits = c(600, 1000)),
+scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1100)),
+                 `Non-Word` = scale_x_continuous(limits = c(600, 1100)),
                  `Difference` = scale_x_continuous(limits = c(0, 200)))
 
 # make figure --------------------------
@@ -356,16 +374,16 @@ p <- ggplot(df, aes(x = x)) + theme_gar +
                lineend = "round", size = 2, colour = "black") +
   labs(x = "Bootstrap group trimmed means (ms)",
        y = "Density") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   facet_grid_sc(cols = vars(cond), scales = list(x = scales_x))
 p.boot <- p
 p
 ```
 
-    ## Warning: Removed 1 rows containing non-finite values (stat_density).
-
-![](2depgps_files/figure-markdown_github/unnamed-chunk-12-1.png)
-
-New version with the hierarchical and non-hierarchical confidence intervals superimposed.
+![](2depgps_files/figure-gfm/unnamed-chunk-12-1.png)<!-- --> \##
+Illustrate results (new version) New version with the hierarchical and
+non-hierarchical confidence intervals superimposed.
 
 ``` r
 # compute confidence intervals --------------------------
@@ -407,15 +425,17 @@ df.ci <- tibble(x = c(ci.hierar[1,], ci.level1[1,]),
                 type = factor(rep(c("Hierarchical","Non-hierarchical"), each = 3))
                 )
   
-scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1000)),
-                 `Non-Word` = scale_x_continuous(limits = c(600, 1000)),
+scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1100)),
+                 `Non-Word` = scale_x_continuous(limits = c(600, 1100)),
                  `Difference` = scale_x_continuous(limits = c(0, 200)))
 
 # make figure --------------------------
 p <- ggplot(df, aes(x = x, colour = type)) + theme_gar +
   # density
   geom_line(stat = "density", size = 1) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom",
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   # sample trimmed means: vertical line + label
   geom_vline(data = df.tm, aes(xintercept = tm)) +
   # confidence interval ----------------------
@@ -431,16 +451,18 @@ p.boot2 <- p
 p
 ```
 
-    ## Warning: Removed 1 rows containing non-finite values (stat_density).
+![](2depgps_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
-![](2depgps_files/figure-markdown_github/unnamed-chunk-13-1.png)
+H = hierarchical confidence interval NH = non-hierarchical confidence
+interval
 
-H = hierarchical confidence interval NH = non-hierarchical confidence interval
+# Hierarchical bootstrap: median
 
-Hierarchical bootstrap: median
-==============================
-
-Previous example shows very similar results for the two types of bootstrap procedures. Because the median can lead to choppy bootstrap distributions, especially in the presence of duplicate values, the hierarchical procedure might help smooth the bootstrap distribution because of the variability introduced by random sampling of trials.
+Previous example shows very similar results for the two types of
+bootstrap procedures. Because the median can lead to choppy bootstrap
+distributions, especially in the presence of duplicate values, the
+hierarchical procedure might help smooth the bootstrap distribution
+because of the variability introduced by random sampling of trials.
 
 ``` r
 set.seed(21)
@@ -472,10 +494,10 @@ for(B in 1:nboot){
 }
 ```
 
-Illustrate results
-------------------
+## Illustrate results
 
-We illustrate the group confidence intervals for each condition and for the pairwise differences.
+We illustrate the group confidence intervals for each condition and for
+the pairwise differences.
 
 ``` r
 # compute confidence intervals --------------------------
@@ -517,15 +539,17 @@ df.ci <- tibble(x = c(ci.hierar[1,], ci.level1[1,]),
                 type = factor(rep(c("Hierarchical","Non-hierarchical"), each = 3))
                 )
   
-scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1000)),
-                 `Non-Word` = scale_x_continuous(limits = c(600, 1000)),
+scales_x <- list(`Word` = scale_x_continuous(limits = c(600, 1100)),
+                 `Non-Word` = scale_x_continuous(limits = c(600, 1100)),
                  `Difference` = scale_x_continuous(limits = c(0, 200)))
 
 # make figure --------------------------
 p <- ggplot(df, aes(x = x, colour = type)) + theme_gar +
   # density
   geom_line(stat = "density", size = 1) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom",
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   # sample trimmed means: vertical line + label
   geom_vline(data = df.tm, aes(xintercept = tm)) +
   # confidence interval ----------------------
@@ -542,12 +566,13 @@ p.boot.md <- p
 p
 ```
 
-![](2depgps_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](2depgps_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
-That's the case: the distributions of the bootstrap medians are very irregular. Bootstrapping at two levels (trials and participants) leads to much smoother distributions and very different confidence intervals.
+The distributions of the bootstrap medians are very irregular.
+Bootstrapping at two levels (trials and participants) leads to much
+smoother distributions and different confidence intervals.
 
-Summary figure
-==============
+# Summary figure
 
 ``` r
 legend <- cowplot::get_legend(p.boot2)
@@ -570,4 +595,5 @@ cowplot::plot_grid(p.20,
 
 # save figure
 ggsave(filename=('./figures/figure_hpb.pdf'),width=13,height=15)
+ggsave(filename=('./figures/figure12.pdf'),width=13,height=15)
 ```

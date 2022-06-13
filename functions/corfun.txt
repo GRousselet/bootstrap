@@ -1,0 +1,23 @@
+# Modify spear() to return only correlation coefficient
+spearsim <- function(x,y){
+# Compute Spearman's rho
+corv <- cor(rank(x),rank(y))
+corv
+}
+
+# modify corbsub() accordingly
+corbsubsim <- function(isub,x,y,corfun,...){
+#
+#  Compute correlation for x[isub] and y[isub]
+#  isub is a vector of length n,
+#  a bootstrap sample from the sequence of integers
+#  1, 2, 3, ..., n
+#
+#  This function is used by other functions when computing
+#  bootstrap estimates.
+#
+#  corfun is some correlation function already stored in R
+#
+corbsub <- corfun(x[isub],y[isub],...)
+corbsub
+}
