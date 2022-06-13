@@ -39,20 +39,33 @@ The notebooks contain code to reproduce the figures and analyses presented in th
 |[ptb](/docs/ptb.md)|Percentile-t bootstrap technique|Figures 13-14|
 
 # Direct links to the PDF version of the figures on the OSF
-|-----|
+
 [Figure 1](https://osf.io/scp2j/)
+
 [Figure 2](https://osf.io/t7pkw/)
+
 [Figure 3](https://osf.io/t2qg3/)
+
 [Figure 4](https://osf.io/a4ybr/)
+
 [Figure 5](https://osf.io/r8mns/)
+
 [Figure 6](https://osf.io/hk7cn/)
+
 [Figure 7](https://osf.io/6wvuh/)
+
 [Figure 8](https://osf.io/6wakn/)
+
 [Figure 9](https://osf.io/j9b8n/)
+
 [Figure 10](https://osf.io/fdgx6/)
+
 [Figure 11](https://osf.io/wt9sy/)
+
 [Figure 12](https://osf.io/8fjuv/)
+
 [Figure 13](https://osf.io/wph78/)
+
 [Figure 14](https://osf.io/wqvay/)
 
 # R packages needed
