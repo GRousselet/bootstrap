@@ -1,12 +1,12 @@
 Reproducibility package for the article:
 
-**A practical introduction to the bootstrap: a versatile method to make inferences by using data-driven simulations**
+**An introduction to the bootstrap: a versatile method to make inferences by using data-driven simulations**
 Rousselet G.A., Pernet C.R., Wilcox R.R.
 *submitted*
 
 [[OSF repository](https://osf.io/8b4t5/)] [[GitHub repository](https://github.com/GRousselet/bootstrap)] [[PsyArXiv Preprint](https://psyarxiv.com/h8ft7)]
 
-The repository contains all of the [R](https://www.r-project.org/) code  used in the article. The code is best seen by running the RMarkdown notebooks, within [RStudio](https://www.rstudio.com/). 
+The repository contains all of the [R](https://www.r-project.org/) code  used in the article. The code is best seen by running the RMarkdown notebooks, within [RStudio](https://www.rstudio.com/).
 
 The code is released under the [MIT license](https://opensource.org/licenses/MIT). Copyright 2019, Guillaume A. Rousselet.
 
@@ -21,29 +21,46 @@ The figures are released under the [CC-BY 4.0 license](https://creativecommons.o
 |`figures`|all the figures used in the article, in pdf format (only available on the [OSF](https://osf.io/8b4t5/) version of the repo)|
 |`functions`|extra R functions defined in text files|
 |`docs`|Github html versions of the notebooks (only available on the [GitHub](https://github.com/GRousselet/bootstrap) version of the repo)|
- 
- # Notebooks
+
+# Notebooks
 
 The notebooks contain code to reproduce the figures and analyses presented in the article. They also contain extra resources, figures and analyses.
 
 |Notebook|Description|Figures|
 |-----|-----|-----|
-|[pb](/docs/pb.md)|Description of the percentile bootstrap|Figure 1 (figure_pb.pdf)|
-|[pc](/docs/pc.md)|Percent correct example|Figure 2 (figure_pc.pdf)|
-|[sampdist](/docs/sampdist.md)|Illustrate bootstrap sampling distributions|Figures 3-4 (figure_lognormal_pop.pdf, figure_sampdist_lognormal.pdf)|
-|[coverage](/docs/coverage.md)|Simulations of the coverage, width and power of one-sample confidence intervals|Figures 5, 7, 8 (figure_onesamp_50ci.pdf, figure_onesamp_coverage.pdf, figure_onesamp_stability.pdf)|
-|[notrobust](/docs/notrobust.md)|On its own, the bootstrap does not guarantee robustness|Figure 6 (figure_notrobust.pdf)|
-|[2indgps](/docs/2indgps.md)|Compare 2 independent groups|Figure 9 (figure_2indgps.pdf)|
-|[compcorr](/docs/compcorr.md)|Comparison of correlation coefficients|Figure 10 (figure_compcorr.pdf)|
-|[2depgps](/docs/2depgps.md)|Illustrate hierarchical bootstrap sampling|Figure 11 (figure_hpb.pdf)|
-|[ptb](/docs/ptb.md)|Percentile-t bootstrap technique|Figures 12-13 (figure_ptb.pdf, figure_ptb_explained.pdf)|
-   
+|[pb](/docs/pb.md)|Description of the percentile bootstrap|Figure 1|
+|[pc](/docs/pc.md)|Percent correct example|Figure 2|
+|[sampdist](/docs/sampdist.md)|Illustrate bootstrap sampling distributions|Figures 3-4|
+|[coverage](/docs/coverage.md)|Simulations of the coverage, width and power of one-sample confidence intervals|Figures 5, 7, 8|
+|[notrobust](/docs/notrobust.md)|On its own, the bootstrap does not guarantee robustness|Figure 6|
+|[2indgps](/docs/2indgps.md)|Compare 2 independent groups|Figure 9|
+|[compcorr](/docs/compcorr.md)|Comparison of correlation coefficients|Figures 10-11|
+|[2depgps](/docs/2depgps.md)|Illustrate hierarchical bootstrap sampling|Figure 12|
+|[ptb](/docs/ptb.md)|Percentile-t bootstrap technique|Figures 13-14|
+
+# Direct links to the PDF version of the figures on the OSF
+|-----|
+[Figure 1](https://osf.io/scp2j/)
+[Figure 2](https://osf.io/t7pkw/)
+[Figure 3](https://osf.io/t2qg3/)
+[Figure 4](https://osf.io/a4ybr/)
+[Figure 5](https://osf.io/r8mns/)
+[Figure 6](https://osf.io/hk7cn/)
+[Figure 7](https://osf.io/6wvuh/)
+[Figure 8](https://osf.io/6wakn/)
+[Figure 9](https://osf.io/j9b8n/)
+[Figure 10](https://osf.io/fdgx6/)
+[Figure 11](https://osf.io/wt9sy/)
+[Figure 12](https://osf.io/8fjuv/)
+[Figure 13](https://osf.io/wph78/)
+[Figure 14](https://osf.io/wqvay/)
+
 # R packages needed
-If you want to run the code in RStudio, you will need to install a few packages. 
+If you want to run the code in RStudio, you will need to install a few packages.
 
 To reproduce the figures only, you can install the required packages by typing this in the console:
 
-`install.packages(c("ggplot2", "tibble"))` 
+`install.packages(c("ggplot2", "tibble"))`
 
 Or you can navigate in the GUI to Tools > Install Packages...
 
@@ -59,19 +76,19 @@ then:
 
 To reproduce the summary figures, you also need `cowplot` to combine panels:
 
-`install.packages("cowplot")` 
+`install.packages("cowplot")`
 
 Finally, if you decide to run the simulations, you will need `beepr` to get a little auditory reward:
 
-`install.packages("beepr")` 
-  
-# Additional R functions 
-Here we highlight a few R functions relevant to the tutorial. Most of them are listed in the RMarkdown notebooks, with example syntax. Each notebook will install the appropriate functions for you; otherwise, in the console you can type `source(file.choose())` and select the relevant .txt file. 
+`install.packages("beepr")`
+
+# Additional R functions
+Here we highlight a few R functions relevant to the tutorial. Most of them are listed in the RMarkdown notebooks, with example syntax. Each notebook will install the appropriate functions for you; otherwise, in the console you can type `source(file.choose())` and select the relevant .txt file.
 
 ## Robust estimation and hypothesis testing
-To get all the statistical functions from Rand Wilcox, select the [Rallfun-v35.txt](https://github.com/GRousselet/articles/blob/master/bootstrap/functions/Rallfun-v35.txt) file. See details on this [webpage](https://dornsife.usc.edu/labs/rwilcox/software/). The full description of the functions is available in the book [Introduction to Robust Estimation and Hypothesis Testing](https://books.google.co.uk/books/about/Introduction_to_Robust_Estimation_and_Hy.html?id=8f8nBb4__EYC&printsec=frontcover&source=kp_read_button&redir_esc=y#v=onepage&q&f=false). Here are some of the functions used or mentioned in the notebooks. 
+To get all the statistical functions from Rand Wilcox, select the [Rallfun-v40.txt](https://github.com/GRousselet/articles/blob/master/bootstrap/functions/Rallfun-v40.txt) file. See details on this [webpage](https://dornsife.usc.edu/labs/rwilcox/software/). The full description of the functions is available in the book [Introduction to Robust Estimation and Hypothesis Testing](https://books.google.co.uk/books/about/Introduction_to_Robust_Estimation_and_Hy.html?id=8f8nBb4__EYC&printsec=frontcover&source=kp_read_button&redir_esc=y#v=onepage&q&f=false). Here are some of the functions used or mentioned in the notebooks.
 
-### One-sample 
+### One-sample
 |Name|Description|
 |-----|-----|
 |`onesampb`|one-sample percentile bootstrap for any estimator|
@@ -128,7 +145,7 @@ To get all the statistical functions from Rand Wilcox, select the [Rallfun-v35.t
 # Extra resources
 
 ## R packages for bootstrap inferences
-- [`boot`](https://www.statmethods.net/advstats/bootstrapping.html) 
+- [`boot`](https://www.statmethods.net/advstats/bootstrapping.html)
 - [`resample`](https://cran.r-project.org/web/packages/resample/index.html)
 - [`bootstrap`](https://cran.r-project.org/web/packages/bootstrap/index.html)
 - [`WRS2`](https://cran.r-project.org/web/packages/WRS2/index.html)
