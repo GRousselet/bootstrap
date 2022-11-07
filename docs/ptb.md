@@ -1,7 +1,7 @@
 Bootstrap-t method
 ================
 Guillaume A. Rousselet
-2022-06-13
+2022-11-07
 
 ``` r
 # dependencies
@@ -11,9 +11,11 @@ source('./functions/Rallfun-v40.txt')
 source('./functions/theme_gar.txt')
 source('./functions/functions.txt')
 library(beepr)
-# generate PDF of g-and-k distributions (generalised g-and-h distributions)
-# Prangle (2020) [https://journal.r-project.org/archive/2020/RJ-2020-010/index.html]
-library(gk)
+source('./functions/ghpdf.txt') # code from Yuan Yan
+# dependencies for den_tukey()
+library(LambertW)
+library(gsl)
+library(nleqslv)
 # library(cowplot)
 ```
 
@@ -21,7 +23,7 @@ library(gk)
 sessionInfo()
 ```
 
-    ## R version 4.2.0 (2022-04-22)
+    ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
     ## Running under: macOS Catalina 10.15.7
     ## 
@@ -36,19 +38,21 @@ sessionInfo()
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] gk_0.5.1      beepr_1.3     tibble_3.1.7  ggplot2_3.3.6
+    ## [1] nleqslv_3.3.3    gsl_2.1-7.1      LambertW_0.6.7-1 MASS_7.3-57     
+    ## [5] beepr_1.3        tibble_3.1.8     ggplot2_3.3.6   
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] pillar_1.7.0     compiler_4.2.0   tools_4.2.0      digest_0.6.29   
-    ##  [5] evaluate_0.15    lifecycle_1.0.1  gtable_0.3.0     pkgconfig_2.0.3 
-    ##  [9] rlang_1.0.2      cli_3.3.0        rstudioapi_0.13  yaml_2.3.5      
-    ## [13] xfun_0.31        fastmap_1.1.0    withr_2.5.0      stringr_1.4.0   
-    ## [17] dplyr_1.0.9      knitr_1.39       generics_0.1.2   vctrs_0.4.1     
-    ## [21] grid_4.2.0       tidyselect_1.1.2 glue_1.6.2       R6_2.5.1        
-    ## [25] fansi_1.0.3      rmarkdown_2.14   purrr_0.3.4      magrittr_2.0.3  
-    ## [29] scales_1.2.0     ellipsis_0.3.2   htmltools_0.5.2  colorspace_2.0-3
-    ## [33] utf8_1.2.2       stringi_1.7.6    munsell_0.5.0    crayon_1.5.1    
-    ## [37] audio_0.1-10
+    ##  [1] Rcpp_1.0.9         plyr_1.8.7         RColorBrewer_1.1-3 pillar_1.8.1      
+    ##  [5] compiler_4.2.1     tools_4.2.1        digest_0.6.30      evaluate_0.15     
+    ##  [9] lifecycle_1.0.3    gtable_0.3.1       pkgconfig_2.0.3    rlang_1.0.6       
+    ## [13] cli_3.4.1          rstudioapi_0.13    yaml_2.3.5         xfun_0.31         
+    ## [17] fastmap_1.1.0      withr_2.5.0        stringr_1.4.1      dplyr_1.0.10      
+    ## [21] knitr_1.39         generics_0.1.3     vctrs_0.5.0        grid_4.2.1        
+    ## [25] tidyselect_1.1.2   glue_1.6.2         R6_2.5.1           lamW_2.1.1        
+    ## [29] fansi_1.0.3        rmarkdown_2.14     reshape2_1.4.4     purrr_0.3.4       
+    ## [33] magrittr_2.0.3     scales_1.2.1       htmltools_0.5.3    colorspace_2.0-3  
+    ## [37] utf8_1.2.2         stringi_1.7.8      RcppParallel_5.1.5 munsell_0.5.0     
+    ## [41] audio_0.1-10
 
 # Functions from Rand Wilcox
 
@@ -193,12 +197,10 @@ and medians.
 ``` r
 set.seed(21)
 nsim <- 1000000 # population size
-nkde <- 50000 # sample size for KDE
+
 # g-and-h parameters
 gseq <- seq(0,1,0.1) # sequence of g parameters
 h <- 0
-A <- 0 # location parameter
-B <- 1 # scale parameter
 xseq <- seq(-5,7,0.01) # points at which to compute PDF
 gh.pdf <- matrix(0, nrow = length(xseq), ncol = length(gseq)) # PDFs to plot in next figure
 mean.g <- vector(mode = "numeric", length = length(gseq))
@@ -208,12 +210,9 @@ md.g <- vector(mode = "numeric", length = length(gseq))
 
 for(G in 1:length(gseq)){
   print(paste("gseq =",G,"/",length(gseq)))
-  beep(2)
-  set.seed(7)
+  set.seed(7) # get same random numbers before transformation
   samp <- ghdist(nsim, g = gseq[G], h = 0)
-  # gh.kde[,G] <- akerd(ghdist(nkde, g = gseq[G], h = 0), 
-  #                     pts = xseq, pyhat = TRUE, plotit = FALSE)
-  gh.pdf[,G] <- gk::dgh(xseq, A, B, gseq[G], h)
+  gh.pdf[,G] <- den_tukey(xseq, gseq[G], h)
   mean.g[G] <- mean(samp) # population mean
   tmean10.g[G] <- mean(samp, trim = 0.1) # population 10% trimmed mean
   tmean20.g[G] <- mean(samp, trim = 0.2) # population 20% trimmed mean
@@ -250,6 +249,8 @@ p <- ggplot(df, aes(x = x, y = y, colour = g)) + theme_gar +
   guides(colour = guide_legend(override.aes = list(size=3)))
 p
 ```
+
+    ## Warning: Removed 2578 row(s) containing missing values (geom_path).
 
 ![](ptb_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 

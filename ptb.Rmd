@@ -22,9 +22,12 @@ source('./functions/Rallfun-v40.txt')
 source('./functions/theme_gar.txt')
 source('./functions/functions.txt')
 library(beepr)
-# generate PDF of g-and-k distributions (generalised g-and-h distributions)
-# Prangle (2020) [https://journal.r-project.org/archive/2020/RJ-2020-010/index.html]
-library(gk)
+# generate PDF of g-and-h distributions 
+source('./functions/ghpdf.txt') # code from Yuan Yan
+# dependencies for den_tukey()
+library(LambertW)
+library(gsl)
+library(nleqslv)
 # library(cowplot)
 ```
 
@@ -158,12 +161,10 @@ We generate populations of size n = 1,000,000 and save their means, trimmed mean
 ```{r, eval = FALSE}
 set.seed(21)
 nsim <- 1000000 # population size
-nkde <- 50000 # sample size for KDE
+
 # g-and-h parameters
 gseq <- seq(0,1,0.1) # sequence of g parameters
 h <- 0
-A <- 0 # location parameter
-B <- 1 # scale parameter
 xseq <- seq(-5,7,0.01) # points at which to compute PDF
 gh.pdf <- matrix(0, nrow = length(xseq), ncol = length(gseq)) # PDFs to plot in next figure
 mean.g <- vector(mode = "numeric", length = length(gseq))
@@ -173,12 +174,9 @@ md.g <- vector(mode = "numeric", length = length(gseq))
 
 for(G in 1:length(gseq)){
   print(paste("gseq =",G,"/",length(gseq)))
-  beep(2)
-  set.seed(7)
+  set.seed(7) # get same random numbers before transformation
   samp <- ghdist(nsim, g = gseq[G], h = 0)
-  # gh.kde[,G] <- akerd(ghdist(nkde, g = gseq[G], h = 0), 
-  #                     pts = xseq, pyhat = TRUE, plotit = FALSE)
-  gh.pdf[,G] <- gk::dgh(xseq, A, B, gseq[G], h)
+  gh.pdf[,G] <- den_tukey(xseq, gseq[G], h)
   mean.g[G] <- mean(samp) # population mean
   tmean10.g[G] <- mean(samp, trim = 0.1) # population 10% trimmed mean
   tmean20.g[G] <- mean(samp, trim = 0.2) # population 20% trimmed mean

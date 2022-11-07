@@ -1,7 +1,7 @@
 Compare correlations
 ================
 Guillaume A. Rousselet
-2022-06-13
+2022-11-07
 
 # Dependencies
 
@@ -13,9 +13,12 @@ library(beepr)
 # library(cowplot)
 source("./functions/theme_gar.txt")
 source("./functions/Rallfun-v40.txt")
-# generate PDF of g-and-k distributions (generalised g-and-h distributions)
-# Prangle (2020) [https://journal.r-project.org/archive/2020/RJ-2020-010/index.html]
-library(gk) 
+# generate PDF of g-and-h distributions 
+source('./functions/ghpdf.txt') # code from Yuan Yan
+# dependencies for den_tukey()
+library(LambertW)
+library(gsl)
+library(nleqslv)
 # Adaptation of code from Ruscio & Kaczetow (2008) to generate multivariate correlated data
 source("./functions/gengh.txt") 
 source("./functions/corfun.txt")
@@ -25,7 +28,7 @@ source("./functions/corfun.txt")
 sessionInfo()
 ```
 
-    ## R version 4.2.0 (2022-04-22)
+    ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
     ## Running under: macOS Catalina 10.15.7
     ## 
@@ -40,19 +43,21 @@ sessionInfo()
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] gk_0.5.1      beepr_1.3     cubelyr_1.0.1 ggplot2_3.3.6 tibble_3.1.7 
+    ## [1] nleqslv_3.3.3    gsl_2.1-7.1      LambertW_0.6.7-1 MASS_7.3-57     
+    ## [5] beepr_1.3        cubelyr_1.0.1    ggplot2_3.3.6    tibble_3.1.8    
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] pillar_1.7.0     compiler_4.2.0   tools_4.2.0      digest_0.6.29   
-    ##  [5] evaluate_0.15    lifecycle_1.0.1  gtable_0.3.0     pkgconfig_2.0.3 
-    ##  [9] rlang_1.0.2      cli_3.3.0        rstudioapi_0.13  yaml_2.3.5      
-    ## [13] xfun_0.31        fastmap_1.1.0    withr_2.5.0      stringr_1.4.0   
-    ## [17] dplyr_1.0.9      knitr_1.39       generics_0.1.2   vctrs_0.4.1     
-    ## [21] grid_4.2.0       tidyselect_1.1.2 glue_1.6.2       R6_2.5.1        
-    ## [25] fansi_1.0.3      rmarkdown_2.14   purrr_0.3.4      magrittr_2.0.3  
-    ## [29] scales_1.2.0     ellipsis_0.3.2   htmltools_0.5.2  colorspace_2.0-3
-    ## [33] utf8_1.2.2       stringi_1.7.6    munsell_0.5.0    crayon_1.5.1    
-    ## [37] audio_0.1-10
+    ##  [1] Rcpp_1.0.9         plyr_1.8.7         RColorBrewer_1.1-3 pillar_1.8.1      
+    ##  [5] compiler_4.2.1     tools_4.2.1        digest_0.6.30      evaluate_0.15     
+    ##  [9] lifecycle_1.0.3    gtable_0.3.1       pkgconfig_2.0.3    rlang_1.0.6       
+    ## [13] cli_3.4.1          rstudioapi_0.13    yaml_2.3.5         xfun_0.31         
+    ## [17] fastmap_1.1.0      withr_2.5.0        stringr_1.4.1      dplyr_1.0.10      
+    ## [21] knitr_1.39         generics_0.1.3     vctrs_0.5.0        grid_4.2.1        
+    ## [25] tidyselect_1.1.2   glue_1.6.2         R6_2.5.1           lamW_2.1.1        
+    ## [29] fansi_1.0.3        rmarkdown_2.14     reshape2_1.4.4     purrr_0.3.4       
+    ## [33] magrittr_2.0.3     scales_1.2.1       htmltools_0.5.3    colorspace_2.0-3  
+    ## [37] utf8_1.2.2         stringi_1.7.8      RcppParallel_5.1.5 munsell_0.5.0     
+    ## [41] audio_0.1-10
 
 # Correlation functions
 
@@ -243,13 +248,6 @@ corb(x,y, corfun=wincor, tr=0.25, SEED = FALSE)
 mscor(cbind(x,y),corfun=pcor)
 ```
 
-    ## 
-    ## Attaching package: 'MASS'
-
-    ## The following object is masked _by_ '.GlobalEnv':
-    ## 
-    ##     ltsreg
-
     ## $cor
     ##            [,1]       [,2]
     ## [1,]  1.0000000 -0.2724987
@@ -289,18 +287,16 @@ and marginal distributions that follow a *g-and-h* distribution.
 
 ## Illustrate univariate *g-and-h* distributions
 
-We use the function `gk::dgh()` to create PDF of *g-and-h* distributions
-[Prangle
-(2020)](https://journal.r-project.org/archive/2020/RJ-2020-010/index.html).
-*g-and-h* distributions have a median of zero. The parameter g controls
-the asymmetry of the distribution, while the parameter h controls the
-thickness of the tails. With h=0, g=0 corresponds to a normal
-distribution, whereas g=1 gives a distribution with the same shape as a
-lognormal distribution. These distributions are described in this 1985
-book:
+The Tukey *g-and-h* distributions have a median of zero. The parameter g
+controls the asymmetry of the distribution, while the parameter h
+controls the thickness of the tails. With h=0, g=0 corresponds to a
+normal distribution, whereas g=1 gives a distribution with the same
+shape as a lognormal distribution. These distributions are described in
+this 1985 book:
 <http://eu.wiley.com/WileyCDA/WileyTitle/productCd-047004005X.html>
 There is also a description in Rand Wilcox’s book Introduction to Robust
-Estimation. See also: <https://www.jstor.org/stable/25471119>
+Estimation. See also: <https://www.jstor.org/stable/25471119>  
+<https://rss.onlinelibrary.wiley.com/doi/full/10.1111/j.1740-9713.2019.01273.x>
 
 ``` r
 x <- seq(-5, 5, 0.01) # vector of quantiles
@@ -316,7 +312,7 @@ res <- array(data = NA, dim = c(nx, ng, nh), dimnames = list(x = x, g = gseq, h 
 
 for(G in 1:ng){
   for(H in 1:nh){  
-    res[,G,H] <- gk::dgh(x, A, B, gseq[G], hseq[H])  
+    res[,G,H] <- den_tukey(x, gseq[G], hseq[H])  
   }
 }
 

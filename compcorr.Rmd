@@ -23,9 +23,12 @@ library(beepr)
 # library(cowplot)
 source("./functions/theme_gar.txt")
 source("./functions/Rallfun-v40.txt")
-# generate PDF of g-and-k distributions (generalised g-and-h distributions)
-# Prangle (2020) [https://journal.r-project.org/archive/2020/RJ-2020-010/index.html]
-library(gk) 
+# generate PDF of g-and-h distributions 
+source('./functions/ghpdf.txt') # code from Yuan Yan
+# dependencies for den_tukey()
+library(LambertW)
+library(gsl)
+library(nleqslv)
 # Adaptation of code from Ruscio & Kaczetow (2008) to generate multivariate correlated data
 source("./functions/gengh.txt") 
 source("./functions/corfun.txt")
@@ -176,14 +179,14 @@ Here we generate populations that have a known Spearman's correlation and margin
 
 ## Illustrate univariate *g-and-h* distributions
 
-We use the function `gk::dgh()` to create PDF of *g-and-h* distributions [Prangle (2020)](https://journal.r-project.org/archive/2020/RJ-2020-010/index.html). *g-and-h* distributions have a median of zero. The parameter g controls the asymmetry of the distribution, while the parameter h controls the thickness of the tails. With h=0, g=0 corresponds to a normal distribution, whereas g=1 gives a distribution with the same shape as a lognormal distribution. These distributions are described in this 1985 book:
+The Tukey *g-and-h* distributions have a median of zero. The parameter g controls the asymmetry of the distribution, while the parameter h controls the thickness of the tails. With h=0, g=0 corresponds to a normal distribution, whereas g=1 gives a distribution with the same shape as a lognormal distribution. These distributions are described in this 1985 book:
 http://eu.wiley.com/WileyCDA/WileyTitle/productCd-047004005X.html
 There is also a description in Rand Wilcox's book Introduction to Robust Estimation.
 See also:
-https://www.jstor.org/stable/25471119
+https://www.jstor.org/stable/25471119  
+https://rss.onlinelibrary.wiley.com/doi/full/10.1111/j.1740-9713.2019.01273.x  
 
-
-```{r, fig.width=7, fig.height=3, units = "cm"}
+```{r, fig.width=7, fig.height=3, units = "cm", warning=FALSE}
 x <- seq(-5, 5, 0.01) # vector of quantiles
 nx <- length(x)
 A <- 0 # location parameter
@@ -197,7 +200,7 @@ res <- array(data = NA, dim = c(nx, ng, nh), dimnames = list(x = x, g = gseq, h 
 
 for(G in 1:ng){
   for(H in 1:nh){  
-    res[,G,H] <- gk::dgh(x, A, B, gseq[G], hseq[H])  
+    res[,G,H] <- den_tukey(x, gseq[G], hseq[H])  
   }
 }
 
