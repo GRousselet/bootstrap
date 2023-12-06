@@ -2,7 +2,7 @@ Reproducibility package for the article:
 
 **An introduction to the bootstrap: a versatile method to make inferences by using data-driven simulations**
 Rousselet G.A., Pernet C.R., Wilcox R.R.
-*submitted*
+[*Meta-Psychology*](https://open.lnu.se/index.php/metapsychology/article/view/2058)
 
 [[OSF repository](https://osf.io/8b4t5/)] [[GitHub repository](https://github.com/GRousselet/bootstrap)] [[PsyArXiv Preprint](https://psyarxiv.com/h8ft7)]
 
